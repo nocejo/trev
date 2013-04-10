@@ -109,6 +109,8 @@ Some ship with perl:
 
 L10N
 
+=head1 NO EDITED BELOW ======================================================
+
 =head1 RETURN VALUE
 
 What the program or function returns, if successful. This section can be omitted for programs whose precise exit codes aren't important, provided they return 0 on success and non-zero on failure as is standard. It should always be present for functions. For modules, it may be useful to summarize return values from the module interface here, or it may be more useful to discuss return values separately in the documentation of each function or method the module provides.
