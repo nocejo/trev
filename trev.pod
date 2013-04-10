@@ -109,7 +109,7 @@ Some ship with perl:
 
 L10N
 
-=head1 NO EDITED BELOW ======================================================
+=head1 NO EDITED BELOW ===============================================
 
 =head1 RETURN VALUE
 
