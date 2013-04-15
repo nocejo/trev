@@ -46,6 +46,12 @@ my $STRING_MSG_UND = "No comprendido.";
 my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
 my $STRING_NOW_TXT = " Revisando ahora:";
 
+# ---------------------------------------------------------- selection and filter defaults
+my $selatt = "active";    # selection attribute
+my $on     = "start";     # select action
+my $off    = "stop";      # unselect action
+my $filter = "";
+
 # < < < < < < < < < < < < < < <  Configuration < < < < < < < < < < < < < < < < < < < < < <
 
 # -------------------------------------------------------------------------- Version check
@@ -62,10 +68,6 @@ $term->ornaments(0);    # disable prompt default styling (underline)
 # ---------------------------------------------------------------------- Parsing arguments
 # -------------------------------------------- set defaults:
 my $start  = -1;
-my $filter = "";
-my $selatt = "active";    # selection attribute
-my $on     = "start";     # select action
-my $off    = "stop";      # unselect action
 
 if ( scalar(@ARGV) != 0 ) {
     if ( $ARGV[0] =~ m/\+\+(.+)/ )
