@@ -20,31 +20,29 @@ my $sepstyle = "underline bold";
 
 # Uncomment STRINGs in your preferred localization ---------------------------------- L10N
 # ---------------------------------------------------------------------------------- en-US
-#my $STRING_LBL_SEL  = " Selected:";
+#my $STRING_LBL_SEL  = "Selected:";
 #my $STRING_MSG_AMB  = "is ambiguous, can be:";
 #my $STRING_MSG_END  = "Finished.";
 #my $STRING_MSG_ERR  = "Warning: not completed";
 #my $STRING_MSG_NON  = "\nNone\n\n";
-#my $STRING_MSG_NOT  = " is not open.";
 #my $STRING_MSG_QIT  = "Terminated (task ";
 #my $STRING_MSG_RET  = "Press [RET] to continue: ";
 #my $STRING_MSG_STA  = ": doesn't appear as visible.";
 #my $STRING_MSG_UND  = "Not understood.";
 #my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
-#my $STRING_NOW_TXT  = " Now reviewing:";
+#my $STRING_NOW_TXT  = "Now reviewing:";
 # ---------------------------------------------------------------------------------- es-ES
-my $STRING_LBL_SEL = " Seleccionadas:";
+my $STRING_LBL_SEL = "Seleccionadas:";
 my $STRING_MSG_AMB = "es ambiguo, puede ser:";
 my $STRING_MSG_END = "Finalizado.";
 my $STRING_MSG_ERR = "Aviso: no se completa";
 my $STRING_MSG_NON = "\nNinguna\n\n";
-my $STRING_MSG_NOT = " no está abierta.";
 my $STRING_MSG_QIT = "Terminado (tarea ";
 my $STRING_MSG_RET = "Presione [RET] para continuar: ";
 my $STRING_MSG_STA = ": no aparece como visible.";
 my $STRING_MSG_UND = "No comprendido.";
 my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
-my $STRING_NOW_TXT = " Revisando ahora:";
+my $STRING_NOW_TXT = "Revisando ahora:";
 
 # ---------------------------------------------------------- selection and filter defaults
 my $selatt = "active";    # selection attribute
@@ -149,8 +147,8 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
         # my ( $cols, $rows ,$p , $ph ) = GetTerminalSize( <STDOUT> ); # perhaps MSWindows
         # my ( $cols, $rows ) = GetTerminalSize( <STDOUT> ); # Unix & MSWindows?
     my $sep = my $lbl = my $now = " " x ( $cols - 1 );
-    substr( $lbl, 0, length($STRING_LBL_SEL) ) = $STRING_LBL_SEL;
-    substr( $now, 0, length($STRING_NOW_TXT) ) = $STRING_NOW_TXT;
+    substr( $lbl, 1, length($STRING_LBL_SEL) ) = $STRING_LBL_SEL;
+    substr( $now, 1, length($STRING_NOW_TXT) ) = $STRING_NOW_TXT;
 
 # ----------------------------------------------------------------------- Progress bar
     my $progbar = $sep;
@@ -197,25 +195,16 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
         $i--;
         next;
     }
-    elsif ( $line =~ m/^-(.*)/ ) {    # something following -
+    elsif ( $line =~ m/^-(.*)/ ) {             # something following -
         my $other = $1;
-        if ( $other =~ m/^\d+$/ ) {    # at least 1 digit, and only digits
-
-            # check $other is selected (and throwing STDOUT and STDERR)
-            my $sysret = system("task $other rc.verbose:off >/dev/null 2>&1");
-
-            # system() returns a false value on success, then:
-            if ( $sysret == 0 ) {
+        if ( $other =~ m/^\d+$/ ) {            # at least 1 digit, and only digits
                 system("task $other $off");    # unselect
-            }
-            else {
-                print "$other$STRING_MSG_NOT\n$STRING_MSG_RET";
+                print "$STRING_MSG_RET";
                 <STDIN>;
-            }
             $i--;
             next;
         }
-        print "$STRING_MSG_UND\n";
+        print "$STRING_MSG_UND\n$STRING_MSG_RET";
         <STDIN>;
         $i--;
         next;
