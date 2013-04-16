@@ -64,7 +64,6 @@ $term->ornaments(0);    # disable prompt default styling (underline)
 #foreach (sort keys %features) { print "\t$_ => \t$features{$_}\n"; }; exit 0;
 
 # ---------------------------------------------------------------------- Parsing arguments
-# -------------------------------------------- set defaults:
 my $start  = -1;
 
 if ( scalar(@ARGV) != 0 ) {
@@ -94,7 +93,6 @@ if ( scalar(@ARGV) != 0 ) {
     }
     $filter = join( ' ', @ARGV );
 }
-my $taskvoff = "task $filter rc.verbose:off ";
 
 # ------------------------------------------------------------------------ Allowed Actions
 # These actions don't change the total number of tasks:
@@ -113,7 +111,7 @@ my @nonumb = ( 'add', 'log', 'version', 'calendar' );
 # ----------------------------------------------------------------------------- gettasks()
 sub gettasks() {
     my @tasks;
-    foreach my $line (`$taskvoff`) {
+    foreach my $line (`task $filter rc.verbose:off`) {
         if ( $line =~ /^\s{0,3}(\d+)/ ) {
             push( @tasks, $1 );
         }
@@ -164,10 +162,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     print $progbar, "\n", colored( $lbl, $lblstyle ), "\n";
 
 # ------------------------------------------------------------------- Reading selected
-    my $hay = system("$taskvoff $selatt");
+    my $hay = system("task $filter rc.verbose:off $selatt");
     if ( $hay != 0 ) { print($STRING_MSG_NON ); }
     print colored ( $now, $lblstyle ), "\n";
-    system("$taskvoff $curr");
+    system("task $curr rc.verbose:off");
 
 # ----------------------------------------------------------- Getting & Parsing Action
     print colored ( $sep, $sepstyle ), "\n";
