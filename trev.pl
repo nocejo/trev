@@ -63,6 +63,20 @@ $term->ornaments(0);    # disable prompt default styling (underline)
 #print "Features supported by ",$term->ReadLine,"\n";
 #foreach (sort keys %features) { print "\t$_ => \t$features{$_}\n"; }; exit 0;
 
+# ------------------------------------------------------------------------ Allowed Actions
+# These actions don't change the total number of tasks:
+my @allow = (
+    'annotate',    'append',  'denotate', 'edit',
+    'information', 'log',     'prepend',  'start',
+    'stop',        'version', 'calendar'
+);
+
+# These actions can change the total number of tasks:
+my @allowch = ( 'add', 'delete', 'done', 'modify', );    # 'duplicate','undo'
+
+# These actions don't need a task number in the command line:
+my @nonumb = ( 'add', 'log', 'version', 'calendar' );
+
 # ---------------------------------------------------------------------- Parsing arguments
 my $start  = -1;
 
@@ -93,20 +107,6 @@ if ( scalar(@ARGV) != 0 ) {
     }
     $filter = join( ' ', @ARGV );
 }
-
-# ------------------------------------------------------------------------ Allowed Actions
-# These actions don't change the total number of tasks:
-my @allow = (
-    'annotate',    'append',  'denotate', 'edit',
-    'information', 'log',     'prepend',  'start',
-    'stop',        'version', 'calendar'
-);
-
-# These actions can change the total number of tasks:
-my @allowch = ( 'add', 'delete', 'done', 'modify', );    # 'duplicate','undo'
-
-# These actions don't need a task number in the command line:
-my @nonumb = ( 'add', 'log', 'version', 'calendar' );
 
 # ----------------------------------------------------------------------------- gettasks()
 sub gettasks() {
