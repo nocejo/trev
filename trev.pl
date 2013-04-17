@@ -63,6 +63,20 @@ $term->ornaments(0);    # disable prompt default styling (underline)
 #print "Features supported by ",$term->ReadLine,"\n";
 #foreach (sort keys %features) { print "\t$_ => \t$features{$_}\n"; }; exit 0;
 
+# ------------------------------------------------------------------------ Allowed Actions
+# These actions don't change the list of tasks (total number):
+my @allow = (
+    'annotate',    'append',  'denotate', 'edit',
+    'information', 'log',     'prepend',  'start',
+    'stop',        'version', 'calendar'
+);
+
+# These actions can change the list of tasks (total number):
+my @allowch = ( 'add', 'delete', 'done', 'modify', );    # 'duplicate','undo'
+
+# These actions don't need a task number in the command line:
+my @nonumb = ( 'add', 'log', 'version', 'calendar' );
+
 # ---------------------------------------------------------------------- Parsing arguments
 my $start  = -1;
 
@@ -94,53 +108,37 @@ if ( scalar(@ARGV) != 0 ) {
     $filter = join( ' ', @ARGV );
 }
 
-# ------------------------------------------------------------------------ Allowed Actions
-# These actions don't change the total number of tasks:
-my @allow = (
-    'annotate',    'append',  'denotate', 'edit',
-    'information', 'log',     'prepend',  'start',
-    'stop',        'version', 'calendar'
-);
-
-# These actions can change the total number of tasks:
-my @allowch = ( 'add', 'delete', 'done', 'modify', );    # 'duplicate','undo'
-
-# These actions don't need a task number in the command line:
-my @nonumb = ( 'add', 'log', 'version', 'calendar' );
-
 # ----------------------------------------------------------------------------- gettasks()
 sub gettasks() {
     my @tasks;
     foreach my $line (`task $filter rc.verbose:off`) {
-        if ( $line =~ /^\s{0,3}(\d+)/ ) {
+        if ( $line =~ /^\s{0,3}(\d+)/ ) { # digit(s) sequence after 1 to 3 blank spaces
             push( @tasks, $1 );
         }
     }
     return @tasks;
 }
 
-# ------------------------------------------------------------------------------- Entering
+# ----------------------------------------------------------- Preparing Main loop Entrance
 my $uuid;
 my @tasks  = gettasks();
 my $ntasks = scalar(@tasks);
 
-# ------------------------------------------------------------------------------ Main loop
-my $flagorder = 0;
+# (Existence and visibility of requested start task has been already checked)
 if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
         if ( $tasks[$k] == $start ) {
             $start     = $k;
-            $flagorder = 1;
             last;
         }
     }
 }
-if ( $flagorder == 0 ) { $start = 0 }
-for ( my $i = $start ; $i < $ntasks ; $i++ ) {
+if ( $start < 0 ) { $start = 0 }
+for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # ----------------------------- Main Loop
     my $line;
     my $curr = $tasks[$i];
 
-# ------------------------------------------------------------ Terminal width & labels
+    # -------------------------------------------------------- Terminal width & labels
     my ( $rows, $cols ) = split( / /, `stty size` );    # Unix only
         # my ( $cols, $rows ,$p , $ph ) = GetTerminalSize( <STDOUT> ); # perhaps MSWindows
         # my ( $cols, $rows ) = GetTerminalSize( <STDOUT> ); # Unix & MSWindows?
@@ -148,7 +146,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     substr( $lbl, 1, length($STRING_LBL_SEL) ) = $STRING_LBL_SEL;
     substr( $now, 1, length($STRING_NOW_TXT) ) = $STRING_NOW_TXT;
 
-# ----------------------------------------------------------------------- Progress bar
+    # ------------------------------------------------------------------- Progress bar
     my $progbar = $sep;
     my $progind = ( $i + 1 ) . "/" . $ntasks . " ";
     my $barmaxl = $cols - length($progind) - 8;
@@ -161,87 +159,84 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     system $^O eq 'MSWin32' ? 'cls' : 'clear';
     print $progbar, "\n", colored( $lbl, $lblstyle ), "\n";
 
-# ------------------------------------------------------------------- Reading selected
-    my $hay = system("task $filter rc.verbose:off $selatt");
-    if ( $hay != 0 ) { print($STRING_MSG_NON ); }
-    print colored ( $now, $lblstyle ), "\n";
-    system("task $curr rc.verbose:off");
+    # --------------------------------------------------------------- Reading selected
+    my $sel = system("task $filter rc.verbose:off $selatt"); # showing Selected tasks
+    if ( $sel != 0 ) { print($STRING_MSG_NON ); }            # or none
+    print colored ( $now, $lblstyle ), "\n";                 # label Now reviewing:
+    system("task $curr rc.verbose:off");                     # the Now-reviewing: task
 
-# ----------------------------------------------------------- Getting & Parsing Action
-    print colored ( $sep, $sepstyle ), "\n";
-    $line = $term->get_reply( prompt => $prompt );
-    if ( !$line ) {    # void line
-        next;
+    # ------------------------------------------------------- Getting & Parsing Action
+    print colored ( $sep, $sepstyle ), "\n";                 # separating line
+    $line = $term->get_reply( prompt => $prompt );           # getting user input (ui)
+    if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # strip blanks
+    if ( !$line ) {                             # void line
+        next;                                   # proceeds to next task
     }
-    $line =~ s/^\s*//;
-    $line =~ s/\s*$//;    # blanks
-    if ( $line eq "b" ) {
+    if ( $line eq "b" ) {                       # ui: go back
         $i = $i - 2;
-        if ( $i < -1 ) { $i = -1 }    # no cycling back
+        if ( $i < -1 ) { $i = -1 }              # no cycling back the start
         next;
     }
-    elsif ( $line eq "q" ) {
+    elsif ( $line eq "q" ) { # add:|| $line eq "quit" || $line eq "exit" || $line eq "bye" 
         print "$STRING_MSG_QIT$curr).\n";
         exit(0);
     }
-    elsif ( $line eq "+" ) {
-        system("task $curr $on");
-        next;
+    elsif ( $line eq "+" ) {                    # ui: mark current task as selected
+        system("task $curr $on");                   # (no warn if already selected)
+        $i--; next;                             # proceeds with same (current) task
     }
-    elsif ( $line eq "-" ) {
-        system("task $curr $off");
-        $i--;
-        next;
+    elsif ( $line eq "-" ) {                    # ui: mark current task as un-selected
+        system("task $curr $off");                  # (no warn if not selected)
+        $i--; next;                             # proceeds with same (current) task
     }
-    elsif ( $line =~ m/^-(.*)/ ) {             # something following -
+    elsif ( $line =~ m/^-(.*)/ ) {              # ui: '-' followed by some chars
         my $other = $1;
-        if ( $other =~ m/^\d+$/ ) {            # at least 1 digit, and only digits
-                system("task $other $off");    # unselect
+        if ( $other =~ m/^\d+$/ ) {             # at least 1 digit, and only digits
+                system("task $other $off");     # unselect
                 print "$STRING_MSG_RET";
-                <STDIN>;
-            $i--;
-            next;
+                <STDIN>;                        # waiting for [RET]
         }
-        print "$STRING_MSG_UND\n$STRING_MSG_RET";
-        <STDIN>;
-        $i--;
-        next;
+        else {                                  # not only digits after '-'
+            print "$STRING_MSG_UND\n$STRING_MSG_RET";
+            <STDIN>;
+        }
+        $i--; next;                             # proceeds with same (current) task
     }
     else {
-        my ( $command, $comm, $args );
+        my ( $request, $args , $command );
         my @possibilities;
-        my $FLAGCH = 2;    # flag: change number of tasks
-        my $FLAGNN = 1;    # flag: need number of task
+        my $FLAGCH = 2;         # flag: change number of tasks
+        my $FLAGNN = 1;         # flag: need number of task
 
         $line =~ m/(\S+)/;
-        $comm = $1;
-        $line =~ s/$comm//;
+        $request = $1;
+        $line =~ s/$request//;  # strip off request
+        $line =~ s/^\s*//;      # strip blanks
         $args = $line;
-        $line =~ s/^\s*//;    # blanks
-             # Actions that don't change the total number of tasks:
+
+        # Search $request among actions that don't change the total number of tasks:
         foreach my $allow (@allow) {
-            if ( index( $allow, $comm ) == 0 ) {
-                $FLAGCH = 0;
+            if ( index( $allow, $request ) == 0 ) {
+                $FLAGCH = 0;    # flag: request will NOT change the number of tasks
                 push( @possibilities, $allow );
             }
         }
 
-        # Actions that can change the total num of tasks:
+        # Search $request among actions that can change the total number of tasks:
         foreach my $allowch (@allowch) {
-            if ( index( $allowch, $comm ) == 0 ) {
-                $FLAGCH = 1;
+            if ( index( $allowch, $request ) == 0 ) {
+                $FLAGCH = 1;    # flag: request CAN change the number of tasks
                 push( @possibilities, $allowch );
             }
         }
-        if ( $FLAGCH == 2 ) {    # No match
+        if ( $FLAGCH == 2 ) {                       # No match in @allow nor in @allowch
             print("$STRING_MSG_UND\n$STRING_MSG_RET");
             <STDIN>;
-            $i--;
-            next;
+            $i--; next;                             # proceeds with same (current) task
         }
         my $nposs = @possibilities;
         if ( scalar(@possibilities) > 1 ) {    # ambiguous
-            print( "'$comm' $STRING_MSG_AMB ",
+            print( "'$request' $STRING_MSG_AMB ",
                 join( '|', @possibilities ), "\n" );
             print($STRING_MSG_RET);
             <STDIN>;
@@ -258,10 +253,14 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
             }
         }
 
-# ------------------------------------------------------------------------- Acting
+        # --------------------------------------------------------------------- Acting
         my $retval;
-        $uuid =
-          `task $tasks[$i+1] _uuids`;    # !!!!!!!!!!!!!!!!!!!!!! warning: last
+        if ( $i == $ntasks - 1 ) {              # if this is the last task
+            $uuid = -1;                         # mark: no next task
+        }
+        else {
+            $uuid = `task $tasks[$i+1] _uuids`; # get the uuid of the next task
+        }
         if ( $FLAGNN == 1 ) {
             $retval = system("task $curr $command $args");
         }
@@ -271,34 +270,33 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
         if ( $retval != 0 ) { print("$STRING_MSG_ERR $command\n"); }
         print($STRING_MSG_RET);
         <STDIN>;
-
-# ----------------------------------------------------------------- Preparing Next
-# Actions that don't change the total number of tasks:
+            # Here implement: on error return to same-current task? FIXME
+        # ------------------------------------------------------------- Preparing Next
+        # Actions that don't change the total number of tasks:
         if ( $FLAGCH == 0 ) {
-            $i--;
-            next;
+            $i--; next;                 # proceeds with same (current) task
         }
 
         # Actions that can change the total number of tasks:
-        elsif ( $FLAGCH == 1 ) {
+        elsif ( $uuid == -1 ) {
+            print("***\n"); last;   # exit script
+        }
+        else {                  #                       was elsif ( $FLAGCH == 1 ) {
             my @newtasks = gettasks();
             $ntasks = @newtasks;
             for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
                 my $thisuuid = `task $newtasks[$k] _uuids`;
                 if ( $thisuuid eq $uuid ) {
-
-                    # !!!!!!! implement not found => error, exit?
                     $i = $k - 1;
-
-                    # !!!!!!!!!!!!!!!!!!!!!!!!!!! Implementar: last -> first
                     last;
                 }
+                    # FIXME implement not found => error, exit?
             }
             @tasks = @newtasks;
             next;
         }
     }
-}
+}   # -------------------------------------------------------------------------- Main Loop
 print "$STRING_MSG_END\n";    # bye
 exit(0);
 __END__
