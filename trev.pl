@@ -119,12 +119,11 @@ sub gettasks() {
     return @tasks;
 }
 
-# ------------------------------------------------------------------------------- Entering
+# ----------------------------------------------------------- Preparing Main loop Entrance
 my $uuid;
 my @tasks  = gettasks();
 my $ntasks = scalar(@tasks);
 
-# ------------------------------------------------------------------------------ Main loop
 # (Existence and visibility of requested start task has been already checked)
 if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
@@ -135,11 +134,11 @@ if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     }
 }
 if ( $start < 0 ) { $start = 0 }
-for ( my $i = $start ; $i < $ntasks ; $i++ ) {
+for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # ----------------------------- Main Loop
     my $line;
     my $curr = $tasks[$i];
 
-# ------------------------------------------------------------ Terminal width & labels
+    # -------------------------------------------------------- Terminal width & labels
     my ( $rows, $cols ) = split( / /, `stty size` );    # Unix only
         # my ( $cols, $rows ,$p , $ph ) = GetTerminalSize( <STDOUT> ); # perhaps MSWindows
         # my ( $cols, $rows ) = GetTerminalSize( <STDOUT> ); # Unix & MSWindows?
@@ -147,7 +146,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     substr( $lbl, 1, length($STRING_LBL_SEL) ) = $STRING_LBL_SEL;
     substr( $now, 1, length($STRING_NOW_TXT) ) = $STRING_NOW_TXT;
 
-# ----------------------------------------------------------------------- Progress bar
+    # ------------------------------------------------------------------- Progress bar
     my $progbar = $sep;
     my $progind = ( $i + 1 ) . "/" . $ntasks . " ";
     my $barmaxl = $cols - length($progind) - 8;
@@ -160,13 +159,13 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     system $^O eq 'MSWin32' ? 'cls' : 'clear';
     print $progbar, "\n", colored( $lbl, $lblstyle ), "\n";
 
-# ------------------------------------------------------------------- Reading selected
+    # --------------------------------------------------------------- Reading selected
     my $hay = system("task $filter rc.verbose:off $selatt");
     if ( $hay != 0 ) { print($STRING_MSG_NON ); }
     print colored ( $now, $lblstyle ), "\n";
     system("task $curr rc.verbose:off");
 
-# ----------------------------------------------------------- Getting & Parsing Action
+    # ------------------------------------------------------- Getting & Parsing Action
     print colored ( $sep, $sepstyle ), "\n";
     $line = $term->get_reply( prompt => $prompt );
     if ( !$line ) {    # void line
@@ -257,7 +256,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
             }
         }
 
-# ------------------------------------------------------------------------- Acting
+    # --------------------------------------------------------------------- Acting
         my $retval;
         $uuid =
           `task $tasks[$i+1] _uuids`;    # !!!!!!!!!!!!!!!!!!!!!! warning: last
@@ -271,8 +270,8 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
         print($STRING_MSG_RET);
         <STDIN>;
 
-# ----------------------------------------------------------------- Preparing Next
-# Actions that don't change the total number of tasks:
+        # ------------------------------------------------------------- Preparing Next
+        # Actions that don't change the total number of tasks:
         if ( $FLAGCH == 0 ) {
             $i--;
             next;
