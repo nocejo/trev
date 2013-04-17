@@ -255,8 +255,12 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
         # --------------------------------------------------------------------- Acting
         my $retval;
-        $uuid =
-          `task $tasks[$i+1] _uuids`;    # !!!!!!!!!!!!!!!!!!!!!! warning: last
+        if ( $i == $ntasks - 1 ) {              # if this is the last task
+            $uuid = -1;                         # mark: no next task
+        }
+        else {
+            $uuid = `task $tasks[$i+1] _uuids`; # get the uuid of the next task
+        }
         if ( $FLAGNN == 1 ) {
             $retval = system("task $curr $command $args");
         }
@@ -266,28 +270,27 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         if ( $retval != 0 ) { print("$STRING_MSG_ERR $command\n"); }
         print($STRING_MSG_RET);
         <STDIN>;
-
+            # Here implement: on error return to same-current task? FIXME
         # ------------------------------------------------------------- Preparing Next
         # Actions that don't change the total number of tasks:
         if ( $FLAGCH == 0 ) {
-            $i--;
-            next;
+            $i--; next;                 # proceeds with same (current) task
         }
 
         # Actions that can change the total number of tasks:
-        elsif ( $FLAGCH == 1 ) {
+        elsif ( $uuid == -1 ) {
+            print("***\n"); last;   # exit script
+        }
+        else {                  #                       was elsif ( $FLAGCH == 1 ) {
             my @newtasks = gettasks();
             $ntasks = @newtasks;
             for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
                 my $thisuuid = `task $newtasks[$k] _uuids`;
                 if ( $thisuuid eq $uuid ) {
-
-                    # !!!!!!! implement not found => error, exit?
                     $i = $k - 1;
-
-                    # !!!!!!!!!!!!!!!!!!!!!!!!!!! Implementar: last -> first
                     last;
                 }
+                    # FIXME implement not found => error, exit?
             }
             @tasks = @newtasks;
             next;
