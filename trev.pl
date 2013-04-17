@@ -125,17 +125,16 @@ my @tasks  = gettasks();
 my $ntasks = scalar(@tasks);
 
 # ------------------------------------------------------------------------------ Main loop
-my $flagorder = 0;
+# (Existence and visibility of requested start task has been already checked)
 if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
         if ( $tasks[$k] == $start ) {
             $start     = $k;
-            $flagorder = 1;
             last;
         }
     }
 }
-if ( $flagorder == 0 ) { $start = 0 }
+if ( $start < 0 ) { $start = 0 }
 for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     my $line;
     my $curr = $tasks[$i];
