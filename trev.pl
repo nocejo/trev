@@ -160,50 +160,48 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     print $progbar, "\n", colored( $lbl, $lblstyle ), "\n";
 
     # --------------------------------------------------------------- Reading selected
-    my $hay = system("task $filter rc.verbose:off $selatt");
-    if ( $hay != 0 ) { print($STRING_MSG_NON ); }
-    print colored ( $now, $lblstyle ), "\n";
-    system("task $curr rc.verbose:off");
+    my $sel = system("task $filter rc.verbose:off $selatt"); # showing Selected tasks
+    if ( $sel != 0 ) { print($STRING_MSG_NON ); }            # or none
+    print colored ( $now, $lblstyle ), "\n";                 # label Now reviewing:
+    system("task $curr rc.verbose:off");                     # the Now-reviewing: task
 
     # ------------------------------------------------------- Getting & Parsing Action
-    print colored ( $sep, $sepstyle ), "\n";
-    $line = $term->get_reply( prompt => $prompt );
-    if ( !$line ) {    # void line
+    print colored ( $sep, $sepstyle ), "\n";                 # separating line
+    $line = $term->get_reply( prompt => $prompt );           # getting user input (ui)
+    if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # blanks out
+    if ( !$line ) {                             # void line
         next;
     }
-    $line =~ s/^\s*//;
-    $line =~ s/\s*$//;    # blanks
-    if ( $line eq "b" ) {
+    if ( $line eq "b" ) {                       # ui: go back
         $i = $i - 2;
-        if ( $i < -1 ) { $i = -1 }    # no cycling back
+        if ( $i < -1 ) { $i = -1 }              # no cycling back the start
         next;
     }
-    elsif ( $line eq "q" ) {
+    elsif ( $line eq "q" ) { # add:|| $line eq "quit" || $line eq "exit" || $line eq "bye" 
         print "$STRING_MSG_QIT$curr).\n";
         exit(0);
     }
-    elsif ( $line eq "+" ) {
+    elsif ( $line eq "+" ) {                    # ui: mark current task as selected
         system("task $curr $on");
         next;
     }
-    elsif ( $line eq "-" ) {
+    elsif ( $line eq "-" ) {                    # ui: mark current task as un-selected
         system("task $curr $off");
         $i--;
         next;
     }
-    elsif ( $line =~ m/^-(.*)/ ) {             # something following -
+    elsif ( $line =~ m/^-(.*)/ ) {              # ui: '-' followed by some chars
         my $other = $1;
-        if ( $other =~ m/^\d+$/ ) {            # at least 1 digit, and only digits
-                system("task $other $off");    # unselect
+        if ( $other =~ m/^\d+$/ ) {             # at least 1 digit, and only digits
+                system("task $other $off");     # unselect
                 print "$STRING_MSG_RET";
-                <STDIN>;
-            $i--;
-            next;
+                <STDIN>;                        # waiting for [RET]
         }
-        print "$STRING_MSG_UND\n$STRING_MSG_RET";
-        <STDIN>;
-        $i--;
-        next;
+        else {                                  # not only digits after '-'
+            print "$STRING_MSG_UND\n$STRING_MSG_RET";
+            <STDIN>;
+        }
+        $i--; next;                             # follow with same current task
     }
     else {
         my ( $command, $comm, $args );
@@ -216,7 +214,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         $line =~ s/$comm//;
         $args = $line;
         $line =~ s/^\s*//;    # blanks
-             # Actions that don't change the total number of tasks:
+        # Actions that don't change the total number of tasks:
         foreach my $allow (@allow) {
             if ( index( $allow, $comm ) == 0 ) {
                 $FLAGCH = 0;
@@ -256,7 +254,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             }
         }
 
-    # --------------------------------------------------------------------- Acting
+        # --------------------------------------------------------------------- Acting
         my $retval;
         $uuid =
           `task $tasks[$i+1] _uuids`;    # !!!!!!!!!!!!!!!!!!!!!! warning: last
@@ -296,7 +294,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             next;
         }
     }
-}
+}   # -------------------------------------------------------------------------- Main Loop
 print "$STRING_MSG_END\n";    # bye
 exit(0);
 __END__
