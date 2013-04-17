@@ -64,14 +64,14 @@ $term->ornaments(0);    # disable prompt default styling (underline)
 #foreach (sort keys %features) { print "\t$_ => \t$features{$_}\n"; }; exit 0;
 
 # ------------------------------------------------------------------------ Allowed Actions
-# These actions don't change the total number of tasks:
+# These actions don't change the list of tasks (total number):
 my @allow = (
     'annotate',    'append',  'denotate', 'edit',
     'information', 'log',     'prepend',  'start',
     'stop',        'version', 'calendar'
 );
 
-# These actions can change the total number of tasks:
+# These actions can change the list of tasks (total number):
 my @allowch = ( 'add', 'delete', 'done', 'modify', );    # 'duplicate','undo'
 
 # These actions don't need a task number in the command line:
@@ -112,7 +112,7 @@ if ( scalar(@ARGV) != 0 ) {
 sub gettasks() {
     my @tasks;
     foreach my $line (`task $filter rc.verbose:off`) {
-        if ( $line =~ /^\s{0,3}(\d+)/ ) {
+        if ( $line =~ /^\s{0,3}(\d+)/ ) { # digit(s) sequence after 1 to 3 blank spaces
             push( @tasks, $1 );
         }
     }
@@ -168,9 +168,9 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     # ------------------------------------------------------- Getting & Parsing Action
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
     $line = $term->get_reply( prompt => $prompt );           # getting user input (ui)
-    if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # blanks out
+    if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # strip blanks
     if ( !$line ) {                             # void line
-        next;
+        next;                                   # proceeds to next task
     }
     if ( $line eq "b" ) {                       # ui: go back
         $i = $i - 2;
@@ -182,13 +182,12 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         exit(0);
     }
     elsif ( $line eq "+" ) {                    # ui: mark current task as selected
-        system("task $curr $on");
-        next;
+        system("task $curr $on");                   # (no warn if already selected)
+        $i--; next;                             # proceeds with same (current) task
     }
     elsif ( $line eq "-" ) {                    # ui: mark current task as un-selected
-        system("task $curr $off");
-        $i--;
-        next;
+        system("task $curr $off");                  # (no warn if not selected)
+        $i--; next;                             # proceeds with same (current) task
     }
     elsif ( $line =~ m/^-(.*)/ ) {              # ui: '-' followed by some chars
         my $other = $1;
@@ -201,43 +200,43 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             print "$STRING_MSG_UND\n$STRING_MSG_RET";
             <STDIN>;
         }
-        $i--; next;                             # follow with same current task
+        $i--; next;                             # proceeds with same (current) task
     }
     else {
-        my ( $command, $comm, $args );
+        my ( $request, $args , $command );
         my @possibilities;
-        my $FLAGCH = 2;    # flag: change number of tasks
-        my $FLAGNN = 1;    # flag: need number of task
+        my $FLAGCH = 2;         # flag: change number of tasks
+        my $FLAGNN = 1;         # flag: need number of task
 
         $line =~ m/(\S+)/;
-        $comm = $1;
-        $line =~ s/$comm//;
+        $request = $1;
+        $line =~ s/$request//;  # strip off request
+        $line =~ s/^\s*//;      # strip blanks
         $args = $line;
-        $line =~ s/^\s*//;    # blanks
-        # Actions that don't change the total number of tasks:
+
+        # Search $request among actions that don't change the total number of tasks:
         foreach my $allow (@allow) {
-            if ( index( $allow, $comm ) == 0 ) {
-                $FLAGCH = 0;
+            if ( index( $allow, $request ) == 0 ) {
+                $FLAGCH = 0;    # flag: request will NOT change the number of tasks
                 push( @possibilities, $allow );
             }
         }
 
-        # Actions that can change the total num of tasks:
+        # Search $request among actions that can change the total number of tasks:
         foreach my $allowch (@allowch) {
-            if ( index( $allowch, $comm ) == 0 ) {
-                $FLAGCH = 1;
+            if ( index( $allowch, $request ) == 0 ) {
+                $FLAGCH = 1;    # flag: request CAN change the number of tasks
                 push( @possibilities, $allowch );
             }
         }
-        if ( $FLAGCH == 2 ) {    # No match
+        if ( $FLAGCH == 2 ) {                       # No match in @allow nor in @allowch
             print("$STRING_MSG_UND\n$STRING_MSG_RET");
             <STDIN>;
-            $i--;
-            next;
+            $i--; next;                             # proceeds with same (current) task
         }
         my $nposs = @possibilities;
         if ( scalar(@possibilities) > 1 ) {    # ambiguous
-            print( "'$comm' $STRING_MSG_AMB ",
+            print( "'$request' $STRING_MSG_AMB ",
                 join( '|', @possibilities ), "\n" );
             print($STRING_MSG_RET);
             <STDIN>;
