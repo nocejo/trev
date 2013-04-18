@@ -256,7 +256,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         # --------------------------------------------------------------------- Acting
         my $retval;
         if ( $i == $ntasks - 1 ) {              # if this is the last task
-            $uuid = -1;                         # mark: no next task
+            $uuid = "no-next-task";             # mark: no next task
         }
         else {
             $uuid = `task $tasks[$i+1] _uuids`; # get the uuid of the next task
@@ -278,7 +278,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         }
 
         # Actions that can change the total number of tasks:
-        elsif ( $uuid == -1 ) {
+        elsif ( $uuid eq "no-next-task" ) {
             print("***\n"); last;   # exit script
         }
         else {                  #                       was elsif ( $FLAGCH == 1 ) {
