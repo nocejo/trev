@@ -56,6 +56,7 @@ my $filter = "";
 my ( $major, $minor ) = split( /\./, `task --version` );
 if ( $major < 2 || $minor < 2 ) { print "$STRING_MSG_VER\n"; exit(1); }
 
+# ------------------------------------------------------------------ Term::Readline object
 my $term = Term::ReadLine->new('');
 $term->ornaments(0);    # disable prompt default styling (underline)
 
