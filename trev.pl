@@ -82,8 +82,8 @@ my @nonumb = ( 'add', 'log', 'version', 'calendar' );
 my $start  = -1;
 
 if ( scalar(@ARGV) != 0 ) {
-    if ( $ARGV[0] =~ m/\+\+(.+)/ )
-    {                     # selection attribute requested: matches '++some'
+    # if selection attribute requested: matches '++some'
+    if ( $ARGV[0] =~ m/\+\+(.+)/ ) {                     
         $selatt = "+$1";           # selection attribute
         $on     = "modify +$1";    # select action
         $off    = "modify -$1";    # unselect action
@@ -203,6 +203,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         }
         $i--; next;                             # proceeds with same (current) task
     }
+    # ------------------------------------------------------------------ Command requested
     else {
         my ( $request, $args , $command );
         my @possibilities;
