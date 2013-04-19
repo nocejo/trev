@@ -36,6 +36,8 @@ use Term::UI;             # Term::ReadLine UI made easy
 
 # use Term::ReadKey;        # MSWindows?
 
+my $intime = time();                                                  # Record time
+
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 my $prompt   = "trev> ";
 my $lblstyle = "reverse bold";
@@ -203,7 +205,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     }
     elsif ( $line eq "q" ) { # add:|| $line eq "quit" || $line eq "exit" || $line eq "bye" 
         print "$STRING_MSG_QIT$curr).\n";
-        exit(0);
+        last; exit(0);
     }
     elsif ( $line eq "+" ) {                    # ui: mark current task as selected
         system("task $curr $on");                   # (no warn if already selected)
@@ -322,7 +324,15 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         }
     }
 }   # -------------------------------------------------------------------------- Main Loop
-print "$STRING_MSG_END\n";    # bye
+#print "$STRING_MSG_END\n";    # bye
+
+{ use integer; $_ = time() - $intime;
+my $s = $_ % 60; $_ /= 60;
+my $m = $_ % 60; $_ /= 60; $m = ($m == 0) ? "" : $m."m " ;
+my $h = $_ % 24; $_ /= 24; $h = ($h == 0) ? "" : $h."h " ;
+my $d = $_;                $d = ($d == 0) ? "" : $d."d " ;
+print ( "Running for ".$d.$h.$m.$s."s\n" ); }
+
 exit(0);
 __END__
 # -------------------------------------------------------------------------------- __END__
