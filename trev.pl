@@ -36,15 +36,13 @@ use Term::UI;             # Term::ReadLine UI made easy
 
 # use Term::ReadKey;        # MSWindows?
 
-my $intime = time();                                                  # Record time
-
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 my $prompt   = "trev> ";
 my $lblstyle = "reverse bold";
 my $sepstyle = "underline bold";
 
 # Uncomment STRINGs in your preferred localization ---------------------------------- L10N
-# ---------------------------------------------------------------------------------- en-US
+# ---------------------------------------------------------------------------- en-US
 my $STRING_LBL_SEL  = "Selected:";
 my $STRING_MSG_AMB  = "is ambiguous, can be:";
 my $STRING_MSG_END  = "Finished.";
@@ -54,9 +52,10 @@ my $STRING_MSG_QIT  = "Terminated (task ";
 my $STRING_MSG_RET  = "Press [RET] to continue: ";
 my $STRING_MSG_STA  = ": doesn't appear as visible.";
 my $STRING_MSG_UND  = "Not understood.";
+my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
 my $STRING_NOW_TXT  = "Now reviewing:";
-# ---------------------------------------------------------------------------------- es-ES
+# ---------------------------------------------------------------------------- es-ES
 #my $STRING_LBL_SEL = "Seleccionadas:";
 #my $STRING_MSG_AMB = "es ambiguo, puede ser:";
 #my $STRING_MSG_END = "Finalizado.";
@@ -65,6 +64,7 @@ my $STRING_NOW_TXT  = "Now reviewing:";
 #my $STRING_MSG_QIT = "Terminado (tarea ";
 #my $STRING_MSG_RET = "Presione [RET] para continuar: ";
 #my $STRING_MSG_STA = ": no aparece como visible.";
+#my $STRING_MSG_TIM = "Corriendo durante ";
 #my $STRING_MSG_UND = "No comprendido.";
 #my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
 #my $STRING_NOW_TXT = "Revisando ahora:";
@@ -77,9 +77,30 @@ my $filter = "";
 
 # < < < < < < < < < < < < < < <  Configuration < < < < < < < < < < < < < < < < < < < < < <
 
+my $intime = time();                                                  # Record time
+
+# ----------------------------------------------------------------------------- goingout()
+# goingout( $msg , $retval , $showtime );  does not return, exit function.
+# -----------------------------------------------------------------------------
+sub goingout {
+    use integer;
+    my $msg = shift; my $retval = shift; my $showtime = shift;
+
+    print( $msg );
+    if ( $showtime == 1 ) {
+        $_ = time() - $intime;
+        my $s = $_ % 60; $_ /= 60;
+        my $m = $_ % 60; $_ /= 60; $m = ($m == 0) ? "" : $m."m " ;
+        my $h = $_ % 24; $_ /= 24; $h = ($h == 0) ? "" : $h."h " ;
+        my $d = $_;                $d = ($d == 0) ? "" : $d."d " ;
+        print ( $STRING_MSG_TIM.$d.$h.$m.$s."s\n" );
+    }
+    exit( $retval );
+}
+
 # -------------------------------------------------------------------------- Version check
 my ( $major, $minor ) = split( /\./, `task --version` );
-if ( $major < 2 || $minor < 2 ) { print "$STRING_MSG_VER\n"; exit(1); }
+if ( $major < 2 || $minor < 2 ) { goingout( "$STRING_MSG_VER\n" , 10 , 0 ); } # exit
 
 # ------------------------------------------------------------------ Term::Readline object
 my $term = Term::ReadLine->new('');
@@ -126,16 +147,16 @@ if ( scalar(@ARGV) != 0 ) {
 
         # system() returns a false value on success, then:
         if ( $sysret != 0 ) {
-            print "$start$STRING_MSG_STA\n";
-            exit(2);               # exit on error
+            goingout( "$start$STRING_MSG_STA\n" , 20 , 0 );           # exit on error
         }
-
     }
     $filter = join( ' ', @ARGV );
 }
 
 # ----------------------------------------------------------------------------- gettasks()
-sub gettasks() {
+# @tasks = gettasks( );
+# -----------------------------------------------------------------------------
+sub gettasks {
     my @tasks;
     foreach my $line (`task $filter rc.verbose:off`) {
         if ( $line =~ /^\s{0,3}(\d+)/ ) { # digit(s) sequence after 1 to 3 blank spaces
@@ -204,8 +225,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         next;
     }
     elsif ( $line eq "q" ) { # add:|| $line eq "quit" || $line eq "exit" || $line eq "bye" 
-        print "$STRING_MSG_QIT$curr).\n";
-        last; exit(0);
+        goingout( "$STRING_MSG_QIT$curr).\n" , 30 , 1 );     # exit
     }
     elsif ( $line eq "+" ) {                    # ui: mark current task as selected
         system("task $curr $on");                   # (no warn if already selected)
@@ -262,13 +282,12 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             $i--; next;                             # proceeds with same (current) task
         }
         my $nposs = @possibilities;
-        if ( scalar(@possibilities) > 1 ) {    # ambiguous
+        if ( scalar(@possibilities) > 1 ) {         # ambiguous
             print( "'$request' $STRING_MSG_AMB ",
                 join( '|', @possibilities ), "\n" );
             print($STRING_MSG_RET);
             <STDIN>;
-            $i--;
-            next;
+            $i--; next;                             # proceeds with same (current) task
         }
         else {
             $command = $possibilities[0];
@@ -297,7 +316,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         if ( $retval != 0 ) { print("$STRING_MSG_ERR $command\n"); }
         print($STRING_MSG_RET);
         <STDIN>;
-            # Here implement: on error return to same-current task? FIXME
+            # Here implement: return to same-current task on error? FIXME
         # ------------------------------------------------------------- Preparing Next
         # Actions that don't change the total number of tasks:
         if ( $FLAGCH == 0 ) {
@@ -306,7 +325,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
         # Actions that can change the total number of tasks:
         elsif ( $uuid eq "no-next-task" ) {
-            print("***\n"); last;   # exit script
+            goingout( "$STRING_MSG_END\n" , 0 , 1 );  # FIXME: exit script?
         }
         else {                  #                       was elsif ( $FLAGCH == 1 ) {
             my @newtasks = gettasks();
@@ -324,16 +343,8 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         }
     }
 }   # -------------------------------------------------------------------------- Main Loop
-#print "$STRING_MSG_END\n";    # bye
+goingout( "$STRING_MSG_END\n" , 0 , 1 );    # bye
 
-{ use integer; $_ = time() - $intime;
-my $s = $_ % 60; $_ /= 60;
-my $m = $_ % 60; $_ /= 60; $m = ($m == 0) ? "" : $m."m " ;
-my $h = $_ % 24; $_ /= 24; $h = ($h == 0) ? "" : $h."h " ;
-my $d = $_;                $d = ($d == 0) ? "" : $d."d " ;
-print ( "Running for ".$d.$h.$m.$s."s\n" ); }
-
-exit(0);
 __END__
 # -------------------------------------------------------------------------------- __END__
 # See trev.pod for documentation
