@@ -24,6 +24,10 @@
 #
 # http://www.opensource.org/licenses/mit-license.php
 
+#  *************************************************************************************
+#  * WARNING : Under developement, not production state. Watch your data: make backups *
+#  *************************************************************************************
+
 use strict;
 use warnings;
 use utf8;
@@ -37,9 +41,12 @@ use Term::UI;             # Term::ReadLine UI made easy
 # use Term::ReadKey;        # MSWindows?
 
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
-my $prompt   = "trev> ";
-my $lblstyle = "reverse bold";
-my $sepstyle = "underline bold";
+
+# ---------------------------------------------------------- selection and filter defaults
+my $selatt = "active";    # selection attribute
+my $on     = "start";     # select action
+my $off    = "stop";      # unselect action
+my $filter = "";
 
 # Uncomment STRINGs in your preferred localization ---------------------------------- L10N
 # ---------------------------------------------------------------------------- en-US
@@ -69,11 +76,10 @@ my $STRING_NOW_TXT  = "Now reviewing:";
 #my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
 #my $STRING_NOW_TXT = "Revisando ahora:";
 
-# ---------------------------------------------------------- selection and filter defaults
-my $selatt = "active";    # selection attribute
-my $on     = "start";     # select action
-my $off    = "stop";      # unselect action
-my $filter = "";
+# ------------------------------------------------------------------------ Appearance
+my $prompt   = "trev> ";
+my $lblstyle = "reverse bold";
+my $sepstyle = "underline bold";
 
 # < < < < < < < < < < < < < < <  Configuration < < < < < < < < < < < < < < < < < < < < < <
 
