@@ -1,0 +1,22 @@
+Simple user guide
+
+By default trev.pl takes the whole list of tasks presented by taskwarrior, use +active as selection tag and starts reviewing the first task shown by taskwarrior.
+
+When trev.pl is launched it shows a progress bar with number and % of tasks reviewed, a list of selected tasks and the first task to review; then it prompts for an action.
+
+At this prompt you can issue [RET] and the program pass to the next task. Keep repeating [RET] and the program goes through all the tasks to review. If you want to go back to the previous task issue 'b' followed by [RET]. Issuing 'q' followed by [RET] quits the program.
+
+If you issue the plus sign (+), followed by [RET], the current task is tagged and shown in the Selected list. If you are reviewing a selected task and you issue the minus sign (-) followed by return the current task is untagged and removed from the list of Selected. In both cases the current task remain the same.
+
+
+
+Examples:
+
+Review every task tagged +someday, starting at task 25 and tagging/untagging them with 'mod (+/-)someday':
+
+    $ perl trev.pl ++someday 25+ +someday 
+
+Review every task without a due date, tagging/untagging them with 'mod (+/-)someday':
+
+    $ perl trev.pl ++someday due.none:
+
