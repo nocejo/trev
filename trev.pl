@@ -214,7 +214,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     print $progbar, "\n", colored( $lbl, $lblstyle ), "\n";
 
     # --------------------------------------------------------------- Reading selected
-    my $sel = system("task $filter rc.verbose:off $seltag"); # showing Selected tasks
+    my $sel = system("task rc.verbose:off $seltag");         # showing Selected tasks
     if ( $sel != 0 ) { print($STRING_MSG_NON ); }            # or none
     print colored ( $now, $lblstyle ), "\n";                 # label Now reviewing:
     system("task $curr rc.verbose:off");                     # the Now-reviewing: task
