@@ -42,14 +42,14 @@ use Term::UI;             # Term::ReadLine UI made easy
 
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 
-# ---------------------------------------------------------- selection and filter defaults
-my $selatt = "active";    # selection attribute
+# ------------------------------------------------------ selection and filter defaults
+my $seltag = "active";    # selection attribute
 my $on     = "start";     # select action
 my $off    = "stop";      # unselect action
 my $filter = "";
 
-# Uncomment STRINGs in your preferred localization ---------------------------------- L10N
-# ---------------------------------------------------------------------------- en-US
+# Uncomment STRINGs in your preferred localization ------------------------------ L10N
+# ------------------------------------------------------------------------ en-US
 my $STRING_LBL_SEL  = "Selected:";
 my $STRING_MSG_AMB  = "is ambiguous, can be:";
 my $STRING_MSG_END  = "Finished.";
@@ -62,7 +62,7 @@ my $STRING_MSG_UND  = "Not understood.";
 my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
 my $STRING_NOW_TXT  = "Now reviewing:";
-# ---------------------------------------------------------------------------- es-ES
+# ------------------------------------------------------------------------ es-ES
 #my $STRING_LBL_SEL = "Seleccionadas:";
 #my $STRING_MSG_AMB = "es ambiguo, puede ser:";
 #my $STRING_MSG_END = "Finalizado.";
@@ -133,10 +133,11 @@ my @nonumb = ( 'add', 'log', 'version', 'calendar' );
 # ---------------------------------------------------------------------- Parsing arguments
 my $start  = -1;
 
+# command line to parse: $ perl trev.pl [++seltag] [start+] [filter]
 if ( scalar(@ARGV) != 0 ) {
-    # if selection attribute requested: matches '++some'
+    # if selection attribute requested: matches '++something'
     if ( $ARGV[0] =~ m/\+\+(.+)/ ) {                     
-        $selatt = "+$1";           # selection attribute
+        $seltag = "+$1";           # tag that will be used for selection
         $on     = "modify +$1";    # select action
         $off    = "modify -$1";    # unselect action
         shift(@ARGV);              # pulls $ARGV[0] out ; $ARGV[1] => $ARGV[0]
@@ -144,7 +145,7 @@ if ( scalar(@ARGV) != 0 ) {
 
     # if starting task number requested (matches 'digit(s)+'):
     if ( scalar(@ARGV) && $ARGV[0] =~ m/(\d+)\+/ ) {
-        $start = $1;
+        $start = $1;               # starting task number
         $filter =~ s/$start//;
         shift(@ARGV);              # pulls $ARGV[0] out ; $ARGV[1] => $ARGV[0]
 
@@ -156,7 +157,7 @@ if ( scalar(@ARGV) != 0 ) {
             goingout( "$start$STRING_MSG_STA\n" , 20 , 0 );           # exit on error
         }
     }
-    $filter = join( ' ', @ARGV );
+    $filter = join( ' ', @ARGV );   # the rest of the line is considered filter
 }
 
 # ----------------------------------------------------------------------------- gettasks()
@@ -175,7 +176,7 @@ sub gettasks {
 # ----------------------------------------------------------- Preparing Main loop Entrance
 my $uuid;
 my @tasks  = gettasks();
-my $ntasks = scalar(@tasks);
+my $ntasks = scalar( @tasks );
 
 # (Existence and visibility of requested start task has been already checked)
 if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
@@ -213,7 +214,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     print $progbar, "\n", colored( $lbl, $lblstyle ), "\n";
 
     # --------------------------------------------------------------- Reading selected
-    my $sel = system("task $filter rc.verbose:off $selatt"); # showing Selected tasks
+    my $sel = system("task $filter rc.verbose:off $seltag"); # showing Selected tasks
     if ( $sel != 0 ) { print($STRING_MSG_NON ); }            # or none
     print colored ( $now, $lblstyle ), "\n";                 # label Now reviewing:
     system("task $curr rc.verbose:off");                     # the Now-reviewing: task
