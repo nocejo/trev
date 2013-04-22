@@ -43,14 +43,23 @@ use Term::UI;             # Term::ReadLine UI made easy
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 
 # ------------------------------------------------------ selection and filter defaults
-my $seltag = "active";    # selection attribute
+my $filter = "";
+
+my $seltag = "active";    # selection tag (fake, active is a report, not a tag)
 my $on     = "start";     # select action
 my $off    = "stop";      # unselect action
-my $filter = "";
+
+#my $seltag = "+w";        # selection tag  , weekly review.
+#my $on     = "mod +w";    # select action
+#my $off    = "mod -w";    # unselect action
+
+#my $seltag = "+someday";     # selection tag
+#my $on     = "mod +someday"; # select action
+#my $off    = "mod -someday"; # unselect action
 
 # Uncomment STRINGs in your preferred localization ------------------------------ L10N
 # ------------------------------------------------------------------------ en-US
-my $STRING_LBL_SEL  = "Selected:";
+my $STRING_LBL_SEL  = "Selected";
 my $STRING_MSG_AMB  = "is ambiguous, can be:";
 my $STRING_MSG_END  = "Finished.";
 my $STRING_MSG_ERR  = "Warning: not completed";
@@ -63,7 +72,7 @@ my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
 my $STRING_NOW_TXT  = "Now reviewing:";
 # ------------------------------------------------------------------------ es-ES
-#my $STRING_LBL_SEL = "Seleccionadas:";
+#my $STRING_LBL_SEL = "Seleccionadas";
 #my $STRING_MSG_AMB = "es ambiguo, puede ser:";
 #my $STRING_MSG_END = "Finalizado.";
 #my $STRING_MSG_ERR = "Aviso: no se completa";
@@ -197,8 +206,11 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         # my ( $cols, $rows ,$p , $ph ) = GetTerminalSize( <STDOUT> ); # perhaps MSWindows
         # my ( $cols, $rows ) = GetTerminalSize( <STDOUT> ); # Unix & MSWindows?
     my $sep = my $lbl = my $now = " " x ( $cols - 1 );
-    substr( $lbl, 1, length($STRING_LBL_SEL) ) = $STRING_LBL_SEL;
-    substr( $now, 1, length($STRING_NOW_TXT) ) = $STRING_NOW_TXT;
+    my $lbltxt = "$STRING_LBL_SEL ($seltag):";
+    substr( $lbl, 1, length($lbltxt) ) = $lbltxt;
+    
+    my $nowtxt = "($filter) $STRING_NOW_TXT";
+    substr( $now, 1, length($nowtxt) ) = $nowtxt;
 
     # ------------------------------------------------------------------- Progress bar
     my $progbar = $sep;
