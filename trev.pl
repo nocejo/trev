@@ -320,28 +320,28 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
         # --------------------------------------------------------------------- Acting
         my $retval;
-        if ( $i == $ntasks - 1 ) {              # if this is the last task
-            $uuid = "no-next-task";             # mark: no next task
+        if ( $i == $ntasks - 1 ) {                  # if this is the last task
+            $uuid = "no-next-task";                 # mark: no next task
         }
         else {
-            $uuid = `task $tasks[$i+1] _uuids`; # get the uuid of the next task
+            $uuid = `task $tasks[$i+1] _uuids`;     # get the uuid of the next task
         }
-        if ( $FLAGNN == 1 ) {                   # does need a task number
+        if ( $FLAGNN == 1 ) {                       # does need a task number
             $retval = system("task $curr $command $args");
         }
         else {
             $retval = system("task $command $args");
         }
-        if ( $retval != 0 ) {                   # system returned an error
+        if ( $retval != 0 ) {                       # system returned an error
             print("$STRING_MSG_ERR $command\n");
             print($STRING_MSG_RET);
             <STDIN>;
-            $i--; next;                         # proceeds with same (current) task
+            $i--; next;                             # proceeds with same (current) task
         }
         # ------------------------------------------------------------- Preparing Next
         # Actions that don't change the total number of tasks:
         if ( $FLAGCH == 0 ) {
-            $i--; next;                 # proceeds with same (current) task
+            $i--; next;                             # proceeds with same (current) task
         }
 
         # Actions that can change the total number of tasks:
