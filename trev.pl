@@ -274,9 +274,9 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         my $FLAGCH = 2;         # flag: change number of tasks
         my $FLAGNN = 1;         # flag: need number of task
 
-        $line =~ m/(\S+)/;
-        $request = $1;
-        $line =~ s/$request//;  # strip off request
+        $line =~ m/(\S+)/;      # first word (non-spaces)
+        $request = $1;          # just the command - first word
+        $line =~ s/$request//;  # strip request from $line
         $line =~ s/^\s*//;      # strip blanks
         $args = $line;
 
@@ -301,7 +301,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             $i--; next;                             # proceeds with same (current) task
         }
         my $nposs = @possibilities;
-        if ( scalar(@possibilities) > 1 ) {         # ambiguous
+        if ( scalar(@possibilities) > 1 ) {         # ambiguous: more than 1 possibility
             print( "'$request' $STRING_MSG_AMB ",
                 join( '|', @possibilities ), "\n" );
             print($STRING_MSG_RET);
@@ -311,7 +311,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         else {
             $command = $possibilities[0];
         }
-        foreach my $nonumb (@nonumb) {
+        foreach my $nonumb (@nonumb) {              # needs a task number?
             if ( $command eq $nonumb ) {
                 $FLAGNN = 0;
                 last;
@@ -326,16 +326,18 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         else {
             $uuid = `task $tasks[$i+1] _uuids`; # get the uuid of the next task
         }
-        if ( $FLAGNN == 1 ) {
+        if ( $FLAGNN == 1 ) {                   # does need a task number
             $retval = system("task $curr $command $args");
         }
-        elsif ( $FLAGNN == 0 ) {
+        else {
             $retval = system("task $command $args");
         }
-        if ( $retval != 0 ) { print("$STRING_MSG_ERR $command\n"); }
-        print($STRING_MSG_RET);
-        <STDIN>;
-            # Here implement: return to same-current task on error? FIXME
+        if ( $retval != 0 ) {                   # system returned an error
+            print("$STRING_MSG_ERR $command\n");
+            print($STRING_MSG_RET);
+            <STDIN>;
+            $i--; next;                         # proceeds with same (current) task
+        }
         # ------------------------------------------------------------- Preparing Next
         # Actions that don't change the total number of tasks:
         if ( $FLAGCH == 0 ) {
