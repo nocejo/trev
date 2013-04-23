@@ -1,6 +1,6 @@
 Simple user guide
 
-By default trev.pl takes the whole list of tasks presented by taskwarrior, use +active as selection tag and starts reviewing the first task shown by taskwarrior.
+By default trev.pl takes the whole list of tasks presented by taskwarrior, use start as selection tag and starts reviewing the first task shown by taskwarrior.
 
 When trev.pl is launched it shows a progress bar with number and % of tasks reviewed, a list of selected tasks and the first task to review; then it prompts for an action.
 
