@@ -183,7 +183,7 @@ sub gettasks {
 }
 
 # ----------------------------------------------------------- Preparing Main loop Entrance
-my $uuid;
+my $nxtuuid;
 my @tasks  = gettasks();
 my $ntasks = scalar( @tasks );
 
@@ -321,10 +321,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         # --------------------------------------------------------------------- Acting
         my $retval;
         if ( $i == $ntasks - 1 ) {                  # if this is the last task
-            $uuid = "no-next-task";                 # mark: no next task
+            $nxtuuid = "no-next-task";              # mark: no next task
         }
         else {
-            $uuid = `task $tasks[$i+1] _uuids`;     # get the uuid of the next task
+            $nxtuuid = `task $tasks[$i+1] _uuids`;  # get the uuid of the next task
         }
         if ( $FLAGNN == 1 ) {                       # does need a task number
             $retval = system("task $curr $command $args");
@@ -345,7 +345,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         }
 
         # Actions that can change the total number of tasks:
-        elsif ( $uuid eq "no-next-task" ) {
+        elsif ( $nxtuuid eq "no-next-task" ) {
             goingout( "$STRING_MSG_END\n" , 0 , 1 );    # was the last: exit
         }
         else {
@@ -353,7 +353,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             $ntasks = @newtasks;
             for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
                 my $thisuuid = `task $newtasks[$k] _uuids`;
-                if ( $thisuuid eq $uuid ) {
+                if ( $thisuuid eq $nxtuuid ) {
                     $i = $k - 1;
                     last;
                 }
