@@ -346,9 +346,9 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
         # Actions that can change the total number of tasks:
         elsif ( $uuid eq "no-next-task" ) {
-            goingout( "$STRING_MSG_END\n" , 0 , 1 );  # FIXME: exit script?
+            goingout( "$STRING_MSG_END\n" , 0 , 1 );    # was the last: exit
         }
-        else {                  #                       was elsif ( $FLAGCH == 1 ) {
+        else {
             my @newtasks = gettasks();
             $ntasks = @newtasks;
             for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
