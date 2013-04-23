@@ -243,9 +243,6 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         if ( $i < -1 ) { $i = -1 }              # no cycling back the start
         next;
     }
-    elsif ( $line eq "q" ) { # add:|| $line eq "quit" || $line eq "exit" || $line eq "bye" 
-        goingout( "$STRING_MSG_QIT$curr).\n" , 30 , 1 );     # exit
-    }
     elsif ( $line eq "+" ) {                    # ui: mark current task as selected
         system("task $curr $on");                   # (no warn if already selected)
         $i--; next;                             # proceeds with same (current) task
@@ -266,6 +263,9 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             <STDIN>;
         }
         $i--; next;                             # proceeds with same (current) task
+    }
+    elsif ( $line eq "q" || $line eq "quit" || $line eq "exit" ) {  # quit request
+        goingout( "$STRING_MSG_QIT$curr).\n" , 0 , 1 );             # exit
     }
     # ------------------------------------------------------------------ Command requested
     else {
