@@ -233,7 +233,8 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
     # ------------------------------------------------------- Getting & Parsing Action
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
-    $line = $term->get_reply( prompt => $prompt );           # getting user input (ui)
+    # $line = $term->get_reply( prompt => $prompt );   # error: needs up arrow twice
+    $line = $term->readline($prompt);                        # getting user input (ui)
     if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # strip blanks
     if ( !$line ) {                             # void line
         next;                                   # proceeds to next task
