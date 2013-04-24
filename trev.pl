@@ -338,6 +338,8 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             <STDIN>;
             $i--; next;                             # proceeds with same (current) task
         }
+        print($STRING_MSG_RET);
+        <STDIN>;
         # ------------------------------------------------------------- Preparing Next
         # Actions that don't change the total number of tasks:
         if ( $FLAGCH == 0 ) {
