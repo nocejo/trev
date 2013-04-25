@@ -72,8 +72,7 @@ my $STRING_MSG_UND  = "Not understood.";
 my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
 my $STRING_NOW_TXT  = "Now reviewing:";
-
-
+my $STRING_WRN_NUM  = "Changed number of tasks! > ";
 
 # ------------------------------------------------------------------------ es-ES
 #my $STRING_LBL_SEL = "Seleccionadas";
@@ -89,6 +88,7 @@ my $STRING_NOW_TXT  = "Now reviewing:";
 #my $STRING_MSG_UND = "No comprendido.";
 #my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
 #my $STRING_NOW_TXT = "Revisando ahora:";
+#my $STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
 
 # ------------------------------------------------------------------------ Appearance
 my $prompt   = "trev> ";
@@ -206,7 +206,7 @@ if ( $start < 0 ) { $start = 0 }
 my $FLAGNTASKS = 0;                                 # flag: changed number of tasks
 for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # ----------------------------- Main Loop
     my $line;
-    my $curr       = $tasks[$i];
+    my $curr = $tasks[$i];
 
     # -------------------------------------------------------- Terminal width & labels
     my ( $rows, $cols ) = split( / /, `stty size` );    # Unix only
@@ -241,12 +241,14 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     # ------------------------------------------------------- Getting & Parsing Action
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
     
-    if( $FLAGNTASKS == 1 ){ $prompt = "Changed number of tasks! > "; }
-
-    # $line = $term->get_reply( prompt => $prompt );   # error: needs up arrow twice
-    $line = $term->readline($prompt);                        # getting user input (ui)
-
-    if( $FLAGNTASKS == 1 ){ $prompt = "trev> "; $FLAGNTASKS = 0 } # reset flag
+    if( $FLAGNTASKS == 0 ) {
+        $line = $term->readline( $prompt );                  # getting user input (ui)
+    }
+    else {
+        $line = $term->readline( $STRING_WRN_NUM );          # getting user input (ui)
+        $FLAGNTASKS = 0                                      # reset flag
+    }
+   # $line = $term->get_reply( prompt => $prompt );   # error: needs up arrow twice
 
     if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # strip blanks
     if ( !$line ) {                             # void line
