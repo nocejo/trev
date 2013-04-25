@@ -36,7 +36,7 @@ binmode( STDOUT, ":utf8" );    # or use open ":utf8", ":std";
 use Term::ANSIColor;      # Color screen output using ANSI escape sequences
 use Term::ReadLine;       # Perl interface to various readline packages.
 use Term::ReadLine::Gnu;  # Perl extension for the GNU Readline/History Library.
-use Term::UI;             # Term::ReadLine UI made easy
+#use Term::UI;             # Term::ReadLine UI made easy
 
 # use Term::ReadKey;        # MSWindows?
 
