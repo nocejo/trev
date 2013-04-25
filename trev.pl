@@ -72,8 +72,7 @@ my $STRING_MSG_UND  = "Not understood.";
 my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
 my $STRING_NOW_TXT  = "Now reviewing:";
-
-
+my $STRING_WRN_NUM  = "Changed number of tasks! > ";
 
 # ------------------------------------------------------------------------ es-ES
 #my $STRING_LBL_SEL = "Seleccionadas";
@@ -89,6 +88,7 @@ my $STRING_NOW_TXT  = "Now reviewing:";
 #my $STRING_MSG_UND = "No comprendido.";
 #my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
 #my $STRING_NOW_TXT = "Revisando ahora:";
+#my $STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
 
 # ------------------------------------------------------------------------ Appearance
 my $prompt   = "trev> ";
@@ -203,6 +203,7 @@ if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     }
 }
 if ( $start < 0 ) { $start = 0 }
+my $FLAGNTASKS = 0;                                 # flag: changed number of tasks
 for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # ----------------------------- Main Loop
     my $line;
     my $curr = $tasks[$i];
@@ -239,8 +240,16 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
     # ------------------------------------------------------- Getting & Parsing Action
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
-    # $line = $term->get_reply( prompt => $prompt );   # error: needs up arrow twice
-    $line = $term->readline($prompt);                        # getting user input (ui)
+    
+    if( $FLAGNTASKS == 0 ) {
+        $line = $term->readline( $prompt );                  # getting user input (ui)
+    }
+    else {
+        $line = $term->readline( $STRING_WRN_NUM );          # getting user input (ui)
+        $FLAGNTASKS = 0                                      # reset flag
+    }
+   # $line = $term->get_reply( prompt => $prompt );   # error: needs up arrow twice
+
     if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # strip blanks
     if ( !$line ) {                             # void line
         next;                                   # proceeds to next task
@@ -356,8 +365,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
         # Actions that can change the total number of tasks:
         my $FLAGFOUND = 0;                          # uuid found flag
-        my @newtasks = gettasks();
-        my $nwtasks = @newtasks;
+        my @newtasks  = gettasks();
+        my $nwtasks   = @newtasks;
+        if( $nwtasks != $ntasks ){ $FLAGNTASKS = 1; } # set flag: changed number of tasks
+
         for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {  # search current uuid in new list
             my $uuid = `task $newtasks[$k] _uuids`;
             if ( $uuid eq $thisuuid ) {
