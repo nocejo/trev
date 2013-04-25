@@ -183,6 +183,7 @@ sub gettasks {
 }
 
 # ----------------------------------------------------------- Preparing Main loop Entrance
+my $thisuuid;
 my $nxtuuid;
 my @tasks  = gettasks();
 my $ntasks = scalar( @tasks );
@@ -321,6 +322,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
         # --------------------------------------------------------------------- Acting
         my $retval;
+        $thisuuid = `task $tasks[$i] _uuids`;       # get the uuid of this task
         if ( $i == $ntasks - 1 ) {                  # if this is the last task
             $nxtuuid = "no-next-task";              # mark: no next task
         }
@@ -348,23 +350,34 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         }
 
         # Actions that can change the total number of tasks:
-        elsif ( $nxtuuid eq "no-next-task" ) {
-            goingout( "$STRING_MSG_END\n" , 0 , 1 );    # was the last: exit
-        }
-        else {
-            my @newtasks = gettasks();
-            $ntasks = @newtasks;
-            for ( my $k = 0 ; $k < $ntasks ; $k++ ) {
-                my $thisuuid = `task $newtasks[$k] _uuids`;
-                if ( $thisuuid eq $nxtuuid ) {
-                    $i = $k - 1;
-                    last;
-                }
-                    # FIXME implement not found => error, exit?
+#        elsif ( $nxtuuid eq "no-next-task" ) {
+#            goingout( "$STRING_MSG_END\n" , 0 , 1 );    # was the last: exit
+#        }
+#        else {
+        my $FLAGFOUND = 0;                          # uuid found flag
+        my @newtasks = gettasks();
+        my $nwtasks = @newtasks;
+        for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {
+            my $uuid = `task $newtasks[$k] _uuids`;
+            if ( $uuid eq $thisuuid ) {
+                $i = $k;                            # change index to new place
+                $FLAGFOUND = 1;                     # present task uuid found in new list
+                last;
             }
-            @tasks = @newtasks;
-            next;
         }
+        if ( $FLAGFOUND == 1 ) {
+            @tasks = @newtasks;
+            $ntasks = $nwtasks;
+            $i--; next;                             # proceeds with same (current) task
+        }
+
+
+
+                # FIXME implement not found => error, exit?
+
+#        @tasks = @newtasks;
+#        next;
+#        }
     }
 }   # -------------------------------------------------------------------------- Main Loop
 goingout( "$STRING_MSG_END\n" , 0 , 1 );    # bye
