@@ -203,9 +203,10 @@ if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     }
 }
 if ( $start < 0 ) { $start = 0 }
+my $FLAGNTASKS = 0;                                 # flag: changed number of tasks
 for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # ----------------------------- Main Loop
     my $line;
-    my $curr = $tasks[$i];
+    my $curr       = $tasks[$i];
 
     # -------------------------------------------------------- Terminal width & labels
     my ( $rows, $cols ) = split( / /, `stty size` );    # Unix only
@@ -239,8 +240,14 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
     # ------------------------------------------------------- Getting & Parsing Action
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
+    
+    if( $FLAGNTASKS == 1 ){ $prompt = "Changed number of tasks! > "; }
+
     # $line = $term->get_reply( prompt => $prompt );   # error: needs up arrow twice
     $line = $term->readline($prompt);                        # getting user input (ui)
+
+    if( $FLAGNTASKS == 1 ){ $prompt = "trev> "; $FLAGNTASKS = 0 } # reset flag
+
     if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # strip blanks
     if ( !$line ) {                             # void line
         next;                                   # proceeds to next task
@@ -356,8 +363,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
 
         # Actions that can change the total number of tasks:
         my $FLAGFOUND = 0;                          # uuid found flag
-        my @newtasks = gettasks();
-        my $nwtasks = @newtasks;
+        my @newtasks  = gettasks();
+        my $nwtasks   = @newtasks;
+        if( $nwtasks != $ntasks ){ $FLAGNTASKS = 1; } # set flag: changed number of tasks
+
         for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {  # search current uuid in new list
             my $uuid = `task $newtasks[$k] _uuids`;
             if ( $uuid eq $thisuuid ) {
