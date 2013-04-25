@@ -63,6 +63,7 @@ my $STRING_LBL_SEL  = "Selected";
 my $STRING_MSG_AMB  = "is ambiguous, can be:";
 my $STRING_MSG_END  = "Finished.";
 my $STRING_MSG_ERR  = "Warning: not completed";
+my $STRING_MSG_NFD  = "Current and next tasks not found.";
 my $STRING_MSG_NON  = "\nNone\n\n";
 my $STRING_MSG_QIT  = "Terminated (task ";
 my $STRING_MSG_RET  = "Press [RET] to continue: ";
@@ -71,11 +72,15 @@ my $STRING_MSG_UND  = "Not understood.";
 my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
 my $STRING_NOW_TXT  = "Now reviewing:";
+
+
+
 # ------------------------------------------------------------------------ es-ES
 #my $STRING_LBL_SEL = "Seleccionadas";
 #my $STRING_MSG_AMB = "es ambiguo, puede ser:";
 #my $STRING_MSG_END = "Finalizado.";
 #my $STRING_MSG_ERR = "Aviso: no se completa";
+#my $STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
 #my $STRING_MSG_NON = "\nNinguna\n\n";
 #my $STRING_MSG_QIT = "Terminado (tarea ";
 #my $STRING_MSG_RET = "Presione [RET] para continuar: ";
@@ -184,7 +189,7 @@ sub gettasks {
 
 # ----------------------------------------------------------- Preparing Main loop Entrance
 my $thisuuid;
-my $nxtuuid;
+my $nextuuid;
 my @tasks  = gettasks();
 my $ntasks = scalar( @tasks );
 
@@ -324,10 +329,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         my $retval;
         $thisuuid = `task $tasks[$i] _uuids`;       # get the uuid of this task
         if ( $i == $ntasks - 1 ) {                  # if this is the last task
-            $nxtuuid = "no-next-task";              # mark: no next task
+            $nextuuid = "no-next-task";             # mark: no next task
         }
         else {
-            $nxtuuid = `task $tasks[$i+1] _uuids`;  # get the uuid of the next task
+            $nextuuid = `task $tasks[$i+1] _uuids`; # get the uuid of the next task
         }
         if ( $FLAGNN == 1 ) {                       # does need a task number
             $retval = system("task $curr $command $args");
@@ -350,11 +355,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         }
 
         # Actions that can change the total number of tasks:
-#        else {
         my $FLAGFOUND = 0;                          # uuid found flag
         my @newtasks = gettasks();
         my $nwtasks = @newtasks;
-        for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {
+        for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {  # search current uuid in new list
             my $uuid = `task $newtasks[$k] _uuids`;
             if ( $uuid eq $thisuuid ) {
                 $i = $k;                            # change index to new place
@@ -367,17 +371,26 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             $ntasks = $nwtasks;
             $i--; next;                             # proceeds with same (current) task
         }
-        elsif ( $nxtuuid eq "no-next-task" ) {      # was the last and not found: exit
+        elsif ( $nextuuid eq "no-next-task" ) {     # was the last and not found: exit
             goingout( "$STRING_MSG_END\n" , 0 , 1 );
         }
-
-
-
-                # FIXME implement not found => error, exit?
-
-#        @tasks = @newtasks;
-#        next;
-#        }
+        # current uuid not found and was not the last task: 
+        for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {  # search next uuid in new list
+            my $uuid = `task $newtasks[$k] _uuids`;
+            if ( $uuid eq $nextuuid ) {
+                $i = $k;                            # change index to new place
+                $FLAGFOUND = 1;                     # present task uuid found in new list
+                last;
+            }
+        }
+        if ( $FLAGFOUND == 1 ) {
+            @tasks = @newtasks;
+            $ntasks = $nwtasks;
+            $i--; next;                             # proceeds with next task
+        }
+        else {               # was not the last, not found and next not found: exit
+            goingout( "$STRING_MSG_NFD\n" , 0 , 1 ); 
+        }
     }
 }   # -------------------------------------------------------------------------- Main Loop
 goingout( "$STRING_MSG_END\n" , 0 , 1 );    # bye
