@@ -139,10 +139,10 @@ my @allow = (
 );
 
 # These actions can change the list of tasks (total number):
-my @allowch = ( 'add', 'delete', 'done', 'modify', );    # 'duplicate','undo'
+my @allowch = ( 'add', 'delete', 'done', 'modify', 'duplicate','undo' );
 
 # These actions don't need a task number in the command line:
-my @nonumb = ( 'add', 'log', 'version', 'calendar' );
+my @nonumb = ( 'add', 'log', 'version', 'calendar' ,'undo' );
 
 # ---------------------------------------------------------------------- Parsing arguments
 my $start  = -1;
