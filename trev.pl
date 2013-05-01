@@ -71,7 +71,7 @@ my $STRING_MSG_STA  = ": doesn't appear as visible.";
 my $STRING_MSG_UND  = "Not understood.";
 my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
-my $STRING_NOW_TXT  = "Now reviewing:";
+my $STRING_NOW_TXT  = "Reviewing";
 my $STRING_WRN_NUM  = "Changed number of tasks! > ";
 
 # ------------------------------------------------------------------------ es-ES
@@ -87,7 +87,7 @@ my $STRING_WRN_NUM  = "Changed number of tasks! > ";
 #my $STRING_MSG_TIM = "Corriendo durante ";
 #my $STRING_MSG_UND = "No comprendido.";
 #my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
-#my $STRING_NOW_TXT = "Revisando ahora:";
+#my $STRING_NOW_TXT = "Revisando";
 #my $STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
 
 # ------------------------------------------------------------------------ Appearance
@@ -208,48 +208,55 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     my $line;
     my $curr = $tasks[$i];
 
-    # -------------------------------------------------------- Terminal width & labels
+    # ----------------------------------------------------------------- Terminal width
     my ( $rows, $cols ) = split( / /, `stty size` );    # Unix only
         # my ( $cols, $rows ,$p , $ph ) = GetTerminalSize( <STDOUT> ); # perhaps MSWindows
         # my ( $cols, $rows ) = GetTerminalSize( <STDOUT> ); # Unix & MSWindows?
-    my $sep = my $lbl = my $now = " " x ( $cols - 1 );
-    my $lbltxt = "$STRING_LBL_SEL ($seltag):";
-    substr( $lbl, 1, length($lbltxt) ) = $lbltxt;
-    
-    my $nowtxt = "($filter) $STRING_NOW_TXT";
-    substr( $now, 1, length($nowtxt) ) = $nowtxt;
+
+    my $sep = my $uplbl = my $lowlbl = " " x ( $cols - 1 );         # base labels
 
     # ------------------------------------------------------------------- Progress bar
     my $progbar = $sep;
-    my $progind = ( $i + 1 ) . "/" . $ntasks . " ";
-    my $barmaxl = $cols - length($progind) - 8;
+    my $progind = ( $i + 1 ) . "/" . $ntasks; # . " ";
+
+    my $barmaxl = $cols - 8;
     my $percent = ( $i + 1 ) / $ntasks;
     my $bar     = "["
       . "=" x ( $barmaxl * $percent )
       . " " x ( $barmaxl * ( 1 - $percent ) ) . "]";
-    $progind = $progind . $bar . " " . int( 100 * $percent ) . "%";
-    substr( $progbar, 0, length($progind) ) = $progind;
+    my $progtxt = $bar . " " . int( 100 * $percent ) . "%";
+    substr( $progbar, 0, length($progtxt) ) = $progtxt;
     system $^O eq 'MSWin32' ? 'cls' : 'clear';
-    print $progbar, "\n", colored( $lbl, $lblstyle ), "\n";
+    print $progbar, "\n";
 
+    # -------------------------------------------------------------------- Upper label
+    my $uptxt = "$STRING_LBL_SEL ($seltag):";                # upper label text
+    substr( $uplbl, 1, length($uptxt) ) = $uptxt;
+    print colored( $uplbl, $lblstyle ), "\n";
+    
     # --------------------------------------------------------------- Reading selected
     my $sel = system("task rc.verbose:off $seltag");         # showing Selected tasks
     if ( $sel != 0 ) { print($STRING_MSG_NON ); }            # or none
-    print colored ( $now, $lblstyle ), "\n";                 # label Now reviewing:
-    system("task $curr rc.verbose:off");                     # the Now-reviewing: task
 
-    # ------------------------------------------------------- Getting & Parsing Action
+    # -------------------------------------------------------------------- Lower label
+    my $lowtxt = "$STRING_NOW_TXT $filter";
+    $lowtxt = $lowtxt." ($progind):";
+    substr( $lowlbl, 1, length($lowtxt) ) = $lowtxt;
+    print colored ( $lowlbl, $lblstyle ), "\n";              # lower label
+    system("task $curr rc.verbose:off");                     # the task to review
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
     
+    # ------------------------------------------------------------ Getting user input
     if( $FLAGNTASKS == 0 ) {
-        $line = $term->readline( $prompt );                  # getting user input (ui)
+        $line = $term->readline( $prompt );
     }
-    else {
-        $line = $term->readline( $STRING_WRN_NUM );          # getting user input (ui)
+    else {                           # number of tasks changed: issue prompt warning
+        $line = $term->readline( $STRING_WRN_NUM );
         $FLAGNTASKS = 0                                      # reset flag
     }
    # $line = $term->get_reply( prompt => $prompt );   # error: needs up arrow twice
 
+    # ---------------------------------------------------------------- Parsing Action
     if ( $line  ) { $line =~ s/^\s*//; $line =~ s/\s*$//; }  # strip blanks
     if ( !$line ) {                             # void line
         next;                                   # proceeds to next task
