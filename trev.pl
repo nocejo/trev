@@ -220,7 +220,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     my $progind = ( $i + 1 ) . "/" . $ntasks; # . " ";
 
     my $barmaxl = $cols - 8;
-    my $percent = ( $i + 1 ) / $ntasks;
+    my $percent = ( $i ) / $ntasks;
     my $bar     = "["
       . "=" x ( $barmaxl * $percent )
       . " " x ( $barmaxl * ( 1 - $percent ) ) . "]";
