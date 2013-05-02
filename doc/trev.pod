@@ -15,7 +15,7 @@ trev is sort of a mini-shell focusing on taskwarrior reviewing.
 
 This script reads a list of pending taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; this action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.
 
-At the script prompt the user can also include the current into a set of marked tasks which is continously shown.  Tasks into this set are marked by taskwarrior as active or with a certain tag chosen by the user.
+At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked by taskwarrior as active or with a certain tag chosen by the user.
 
 Tasks list comes from a system call to task, obeying then the user preferred settings for visibility, order, decoration...
 
@@ -23,13 +23,13 @@ Tasks list comes from a system call to task, obeying then the user preferred set
 
 =head2 ARGUMENTS
 
-No argument is required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see bellow).
+No argument is required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
 
 =over
 
 =item [++mark]
 
-If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', selecting action to 'modify +mark' and unselecting action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
+If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', marking action to 'modify +mark' and unmarking action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
 
 =item [start+]
 
@@ -37,7 +37,7 @@ A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '+
 
 =item [filter]
 
-The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES bellow.  May be not all filters can be correctly interpreted.
+The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
 
 =back
 
@@ -45,7 +45,7 @@ Order is mandatory: if a marking tag is specified it must be issued as the first
 
 =head3 EXAMPLES
 
-See EXAMPLES bellow
+See EXAMPLES below
 
 =head2 OPTIONS AT THE SCRIPT PROMPT
 
