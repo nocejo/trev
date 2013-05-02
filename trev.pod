@@ -3,195 +3,196 @@
 
 =head1 NAME
 
-trev.pl - carries out taskwarrior tasks reviewing
+trev.pl - taskwarrior tasks reviewing script
 
 =head1 SYNOPSIS
 
-perl trev.pl [++seltag] [start+] [filter]
+perl trev.pl [++mark] [start+] [filter]
 
 =head1 DESCRIPTION
 
-trev tries to be sort of a mini-shell focusing on taskwarrior reviewing.
+trev is sort of a mini-shell focusing on taskwarrior reviewing.
 
 This script reads a list of pending taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; this action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.
 
-At the script prompt the user can also include the current into a set of selected tasks which is continously shown. Tasks into this set are marked by taskwarrior as active or with a certain tag chosen by the user.
+At the script prompt the user can also include the current into a set of marked tasks which is continously shown.  Tasks into this set are marked by taskwarrior as active or with a certain tag chosen by the user.
 
-List comes from a system call to task, obeying then the user preferred settings for visibility, order, decoration...
+Tasks list comes from a system call to task, obeying then the user preferred settings for visibility, order, decoration...
 
 =head1 OPTIONS
 
 =head2 ARGUMENTS
 
-No argument is required. Optional arguments can be issued to set a selection tag, a task number for the review to start and/or a taskwarrior filter.
+No argument is required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see bellow).
 
 =over
 
-=item [++seltag]
+=item [++mark]
 
-If first argument starts with '++', as in 'trev.pl ++seltag', selection tag will be set to '+seltag', selecting action to 'modify +seltag' and unselecting action to 'modify -seltag'. Double '+' is required in order to distinguish from a regular tag intended to be used as a filter. If not set, default selection tag is 'active', selecting action is 'start' and unselecting action is 'stop'.
+If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', selecting action to 'modify +mark' and unselecting action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
 
 =item [start+]
 
-A numeric argument ending in '+' as in 'trev.pl 113+' requests the script to start reviewing at task number 113, and proceed to the end of the list. This can be useful when resuming an interrupted long review. Final '+' is required in order to distinguish from a just-one-task filter, like in 'trev.pl 113'. 
+A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in 'trev.pl 113'.
 
 =item [filter]
 
-A taskwarrior filter can be passed to the script alone or following other arguments. Not all filters are correctly interpreted.
+The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES bellow.  May be not all filters can be correctly interpreted.
 
 =back
 
-Order is mandatory: if a selection tag is specified it must be issued as the first argument; starting task number can be first (if no selection tag) or second (first is selection tag). Filter can go in third, second or first place, depending if none or other(s) argument(s) appear. 
+Order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter can go in third, second or first place, depending if none or other(s) argument(s) appear.
 
 =head3 EXAMPLES
 
-=over
-
-=item trev.pl ++week 113+ pro:wp5
-
-Set selection tag to +week, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
-
-=item trev.pl ++calendula +ate_loops
-
-Select/deselect using 'modify +/-calendula'. Only ate_loops tagged tasks.
-
-=item trev.pl 113+ due:
-
-Processes only tasks without a due date. Start at task 113. Select/deselect with start/stop and starts at the top of the list (defaults).
-
-=item trev.pl 113
-
-Review just task 113. Start/stop for select/deselect (default).
-
-=item trev.pl amsterdam
-
-Review every task containing amsterdam in its description, starting at the top of the list and selecting with start/stop. 
-
-=back
+See EXAMPLES bellow
 
 =head2 OPTIONS AT THE SCRIPT PROMPT
 
-(add, annotate, append, calendar, delete, denotate, done, edit, information, log, modify, prepend, start and stop, apart of version, but see ACTIONS below) At the prompt following actions can be issued:
+After displaying a progress bar, marked tasks and the current task, the script prompts for an action. At this prompt you can issue this actions (entering them with [RET]):
 
-Issuing - at the prompt the current task is extracted from the set.
-
-=over 4
+=over 8
 
 =item [RET]
 
-  [RETURN] or void line. Proceeds to the next task.
+[RETURN] or void line.  No action.  Proceeds to the next task.
 
 =item b
 
-  Proceeds to the previous task.
+Goes back to the previous task.
 
 =item +
 
-  Marks task as selected and made it part of the bag.
+Marks task as 'active' (start-ing it, default) or with the requested marking tag.
 
 =item -
 
-  Deselects task and take it out of the bag. If followed by a number, as in '-156', action is applied to the referred task number, not to current.
+Unmarks current task and take it out of the 'marked' set.
 
+=item -n
+
+If '-' is followed by a number, as in '-156', unmarks the referred task number, not to current.
+
+=item action [args]
+
+Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version. Those that need a task number operate on the current task. Can be shortened when not ambiguous.  Any action to perform on other task like in '175 delete' is not allowed.
+
+=item q, quit, exit, bye
+
+Terminate script execution.
 
 =back
 
+
 =head1 DEPENDENCIES
 
-Some ship with perl:
-    Term::ANSIColor;       Color screen output using ANSI escape sequences.
-    Term::ReadLine;        Perl interface to various readline packages.
-    Term::ReadLine::Gnu;   Perl extension for the GNU Readline/History Library.
-    Term::UI;              Term::ReadLine UI made easy.
-    Term::ReadKey;         MSWindows?
+Of course, task (>2.0.0) must be installed.
+
+Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine . But some do not:
+
+=over 4
+
+=item Term::ReadLine::Gnu
+
+Perl extension for the GNU Readline/History Library.
+
+=back
+
+You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or to get it from CPAN.
 
 =head1 CONFIGURATION
 
-L10N
+Defaults (mark and marking actions, prompt text, label and separator styles) can be modified directly in the Configuration section of the script source code.  Perl is an interpreted scripting language, so no compilation or building is needed.
 
-=head1 NO EDITED BELOW ===============================================
-
-=head1 RETURN VALUE
-
-What the program or function returns, if successful. This section can be omitted for programs whose precise exit codes aren't important, provided they return 0 on success and non-zero on failure as is standard. It should always be present for functions. For modules, it may be useful to summarize return values from the module interface here, or it may be more useful to discuss return values separately in the documentation of each function or method the module provides.
-
-=head1 ERRORS
-
-Exceptions, error return codes, exit statuses, and errno settings. Typically used for function or module documentation; program documentation uses DIAGNOSTICS instead. The general rule of thumb is that errors printed to STDOUT  or STDERR  and intended for the end user are documented in DIAGNOSTICS while errors passed internal to the calling program and intended for other programmers are documented in ERRORS. When documenting a function that sets errno, a full list of the possible errno values should be given here.
-
-=head1 DIAGNOSTICS
-
-All possible messages the program can print out and what they mean. You may wish to follow the same documentation style as the Perl documentation; see perldiag(1) for more details (and look at the POD source as well).
-
-If applicable, please include details on what the user should do to correct the error; documenting an error as indicating "the input buffer is too small" without telling the user how to increase the size of the input buffer (or at least telling them that it isn't possible) aren't very useful.
+Currently you can choose between two localizations: en-US and es-ES.  This is done in the L10N section of the source code, uncommenting the localized STRINGs in your preferred localization and commenting out the other set.
 
 =head1 EXAMPLES
 
-Give some example uses of the program or function. Don't skimp; users often find this the most useful part of the documentation. The examples are generally given as verbatim paragraphs.
+=over
 
-Don't just present an example without explaining what it does. Adding a short paragraph saying what the example will do can increase the value of the example immensely.
+=item trev.pl
 
-    perl trev.pl pro:svn
-    perl trev.pl due:
-    perl trev.pl 113
-    perl trev.pl oldest
-    perl trev.pl amsterdam
+Reviews all visible tasks (user default filter), starts reviewing at first of them (default), mark/unmark current task with start/stop (default).
 
-=head1 ENVIRONMENT
+=item trev.pl ++week
 
-Environment variables that the program cares about, normally presented as a list using =over , =item , and =back . For example:
-Since environment variables are normally in all uppercase, no additional special formatting is generally needed; they're glaring enough as it is.
+Set marking tag to +week and mark/unmark current task with 'modify +week'/'modify -week'.
+
+=item trev.pl ++calendula +ate_loops
+
+Mark/unmark using 'modify +/-calendula'; Reviews only ate_loops tagged tasks.
+
+=item trev.pl ++deleg 113+ pro:wp5
+
+Set marking tag to +deleg, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
+
+=item trev.pl 113+ due:
+
+Processes only tasks without a due date.  Start at task 113.  Mark/unmark with start/stop and starts at the top of the list (defaults).
+
+=item trev.pl ++NOW overdue
+
+Processes overdue tasks.  Mark/unmark with 'modify +/-NOW'.
+
+=item trev.pl 113
+
+Reviews just task 113.  Start/stop for mark/unmark (default).
+
+=item trev.pl amsterdam
+
+Review every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
+
+=back
+
 
 =head1 FILES
 
-All files used by the program or function, normally presented as a list, and what it uses them for. File names should be enclosed in F<>. It's particularly important to document files that will be potentially modified.
+No specific files are used, but the script issues system calls to 'task', and this is the expected name of the task executable. This can be modified inside the source code.
 
 =head1 CAVEATS
 
-Things to take special care with, sometimes called WARNINGS.
+This is a slow script, specially when --after an action-- the order or number of tasks changes and next task must be located through its uuid.
+
+In principle the script is intended to be used off-line, but if orders can come in any form from the web, beware: system calls are issued through backticks and any security check is performed.
 
 =head1 BUGS
 
-Plenty.
-Things that are broken or just don't work quite right.
+Probably.
 
-=head1 RESTRICTIONS
-
-Bugs you don't plan to fix. :-)
-
-=head1 NOTES
-
-Miscellaneous commentary.
 
 =head1 AUTHOR
 
-nocejo E<lt>nocejo at example.fakeE<gt>.
+Fidel Mato E<lt>fidel.mato at gmail.comE<gt>.
 
 =head1 COPYRIGHT AND LICENSE
 
-For copyright
+Copyright 2013, Fidel Mato
 
-   1. Copyright YEAR(s) YOUR NAME(s)
+trev.pl is released under the MIT license.
 
-(No, (C) is not needed. No, "all rights reserved" is not needed.)
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-For licensing the easiest way is to use the same licensing as Perl itself:
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-   1. This library is free software; you may redistribute it and/or modify
-   2. it under the same terms as Perl itself.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-This makes it easy for people to use your module with Perl. Note that this licensing example is neither an endorsement or a requirement, you are of course free to choose any licensing.
-
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-
+http://www.opensource.org/licenses/mit-license.php
 
 =head1 DATE
 
-9-Apr-2013
+2-May-2013
 
 =cut
 
