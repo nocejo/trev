@@ -226,7 +226,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
       . " " x ( $barmaxl * ( 1 - $percent ) ) . "]";
     my $progtxt = $bar . " " . int( 100 * $percent ) . "%";
     substr( $progbar, 0, length($progtxt) ) = $progtxt;
-    system $^O eq 'MSWin32' ? 'cls' : 'clear';
+    system $^O eq 'cygwin' ? 'echo -e "\033[H\033[J"' : ( $^O eq 'MSWin32' ? 'cls' : 'clear' ) ;
     print $progbar, "\n";
 
     # -------------------------------------------------------------------- Upper label
