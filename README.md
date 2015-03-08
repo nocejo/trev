@@ -20,7 +20,7 @@ Tasks list comes from a system call to task, obeying then the user preferred set
 
 ## ARGUMENTS
 
-No argument is required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
+No arguments are required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
 
 - [++mark]
 
@@ -34,7 +34,7 @@ A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '+
 
 The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
 
-Order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter can go in third, second or first place, depending if none or other(s) argument(s) appear.
+Argument order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter can go in third, second or first place, depending if none or other(s) argument(s) appear.
 
 ### EXAMPLES
 
@@ -76,7 +76,7 @@ Terminate script execution.
 
 # DEPENDENCIES
 
-Of course, task (>2.0.0) must be installed.
+Taskwarrior 2.0.0+ must be installed.
 
 Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine . But some do not:
 
@@ -84,7 +84,7 @@ Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadL
 
 Perl extension for the GNU Readline/History Library.
 
-You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or to get it from CPAN.
+You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or get it from CPAN.
 
 # CONFIGURATION
 
@@ -150,7 +150,7 @@ Fidel Mato <fidel.mato at gmail.com>.
 
 # COPYRIGHT AND LICENSE
 
-Copyright 2013, Fidel Mato
+Copyright 2015, Fidel Mato
 
 trev.pl is released under the MIT license.
 
@@ -176,4 +176,4 @@ http://www.opensource.org/licenses/mit-license.php
 
 # DATE
 
-2-May-2013
+8-Mar-2015

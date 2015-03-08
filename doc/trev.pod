@@ -23,7 +23,7 @@ Tasks list comes from a system call to task, obeying then the user preferred set
 
 =head2 ARGUMENTS
 
-No argument is required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
+No arguments are required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
 
 =over
 
@@ -41,7 +41,7 @@ The rest of the line is taken as a taskwarrior filter --task number(s), report n
 
 =back
 
-Order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter can go in third, second or first place, depending if none or other(s) argument(s) appear.
+Argument order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter can go in third, second or first place, depending if none or other(s) argument(s) appear.
 
 =head3 EXAMPLES
 
@@ -86,7 +86,7 @@ Terminate script execution.
 
 =head1 DEPENDENCIES
 
-Of course, task (>2.0.0) must be installed.
+Taskwarrior 2.0.0+ must be installed.
 
 Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine . But some do not:
 
@@ -98,7 +98,7 @@ Perl extension for the GNU Readline/History Library.
 
 =back
 
-You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or to get it from CPAN.
+You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or get it from CPAN.
 
 =head1 CONFIGURATION
 
@@ -192,7 +192,7 @@ http://www.opensource.org/licenses/mit-license.php
 
 =head1 DATE
 
-2-May-2013
+8-Mar-2015
 
 =cut
 

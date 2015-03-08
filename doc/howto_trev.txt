@@ -1,12 +1,12 @@
 Simple user guide
 
-By default trev.pl takes the whole list of tasks presented by taskwarrior, use start as selection tag and starts reviewing the first task shown by taskwarrior.
+By default trev.pl reviews all tasks presented by default report, uses start as selection tag and starts reviewing the first task shown.
 
 When trev.pl is launched it shows a progress bar with number and % of tasks reviewed, a list of selected tasks and the first task to review; then it prompts for an action.
 
 At this prompt you can issue [RET] and the program pass to the next task. Keep repeating [RET] and the program goes through all the tasks to review. If you want to go back to the previous task issue 'b' followed by [RET]. Issuing 'q' followed by [RET] quits the program.
 
-If you issue the plus sign (+), followed by [RET], the current task is tagged and shown in the Selected list. If you are reviewing a selected task and you issue the minus sign (-) followed by return the current task is untagged and removed from the list of Selected. In both cases the current task remain the same.
+If you issue the plus command (+), followed by [RET], the current task is tagged and shown in the selected list. If you are reviewing a selected task and you issue the minus command (-) followed by [RET] the current task is untagged and removed from the selected list. In both cases the current task remain the same.
 
 
 
