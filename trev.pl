@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# trev.pl - carries out taskwarrior tasks reviewing.
+# trev.pl - carries out taskwarrior task review.
 #
 # Copyright 2013, Fidel Mato.
 #
@@ -166,7 +166,7 @@ my $start  = -1;
 # command line to parse: $ perl trev.pl [++seltag] [start+] [filter]
 if ( scalar(@ARGV) != 0 ) {
     # if selection attribute requested: matches '++something'
-    if ( $ARGV[0] =~ m/\+\+(.+)/ ) {                     
+    if ( $ARGV[0] =~ m/\+\+(.+)/ ) {
         $seltag = "+$1";           # tag that will be used for selection
         $on     = "modify +$1";    # select action
         $off    = "modify -$1";    # unselect action
@@ -249,7 +249,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     my $uptxt = "$STRING_LBL_SEL ($seltag):";                # upper label text
     substr( $uplbl, 1, length($uptxt) ) = $uptxt;
     print colored( $uplbl, $lblstyle ), "\n";
-    
+
     # --------------------------------------------------------------- Reading selected
     my $sel = system("task rc.verbose:off $seltag");         # showing Selected tasks
     if ( $sel != 0 ) { print($STRING_MSG_NON ); }            # or none
@@ -261,7 +261,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
     print colored ( $lowlbl, $lblstyle ), "\n";              # lower label
     system("task $curr rc.verbose:off");                     # the task to review
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
-    
+
     # ------------------------------------------------------------ Getting user input
     if( $FLAGNTASKS == 0 ) {
         $line = $term->readline( $prompt );
@@ -412,7 +412,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         elsif ( $nextuuid eq "no-next-task" ) {     # was the last and not found: exit
             goingout( "$STRING_MSG_END\n" , 0 , 1 );
         }
-        # current uuid not found and was not the last task: 
+        # current uuid not found and was not the last task:
         for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {  # search next uuid in new list
             my $uuid = `task $newtasks[$k] _uuids`;
             if ( $uuid eq $nextuuid ) {
@@ -427,7 +427,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             $i--; next;                             # proceeds with next task
         }
         else {               # was not the last, not found and next not found: exit
-            goingout( "$STRING_MSG_NFD\n" , 0 , 1 ); 
+            goingout( "$STRING_MSG_NFD\n" , 0 , 1 );
         }
     }
 }   # -------------------------------------------------------------------------- Main Loop
