@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # trev.pl - carries out taskwarrior tasks reviewing.
 #
