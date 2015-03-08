@@ -136,7 +136,7 @@ sub goingout {
 
 # -------------------------------------------------------------------------- Version check
 my ( $major, $minor ) = split( /\./, `task --version` );
-if ( $major < 2 || $minor < 2 ) { goingout( "$STRING_MSG_VER\n" , 10 , 0 ); } # exit
+if ( $major < 2 || ($major == 2 && $minor < 2)) { goingout( "$STRING_MSG_VER\n" , 10 , 0 ); } # exit
 
 # ------------------------------------------------------------------ Term::Readline object
 my $term = Term::ReadLine->new('');

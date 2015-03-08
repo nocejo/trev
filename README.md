@@ -76,7 +76,7 @@ Terminate script execution.
 
 # DEPENDENCIES
 
-Taskwarrior 2.0.0+ must be installed.
+Taskwarrior 2.2.0+ must be installed.
 
 Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine . But some do not:
 
