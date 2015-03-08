@@ -73,6 +73,14 @@ my $STRING_MSG_TIM  = "Running for ";
 my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
 my $STRING_NOW_TXT  = "Reviewing";
 my $STRING_WRN_NUM  = "Changed number of tasks! > ";
+my $STRING_MSG_HLP  = "Commands:   +                  Mark task\n" .
+                      "            -                  Unmark task\n" .
+                      "            -id                Unmark task [id]\n" .
+                      "            [RET]              Move to next task\n" .
+                      "            b                  Move back to previous task\n" .
+                      "            ?, h[elp]          Display this help\n" .
+                      "            q[uit], exit, bye  Exit\n\n" .
+                      "Press [RET] to continue.\n";
 
 # ------------------------------------------------------------------------ es-ES
 #my $STRING_LBL_SEL = "Seleccionadas";
@@ -89,6 +97,14 @@ my $STRING_WRN_NUM  = "Changed number of tasks! > ";
 #my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
 #my $STRING_NOW_TXT = "Revisando";
 #my $STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
+#my $STRING_MSG_HLP  = "Commands:   +                  Mark task\n" .
+#                      "            -                  Unmark task\n" .
+#                      "            -id                Unmark task [id]\n" .
+#                      "            [RET]              Move to next task\n" .
+#                      "            b                  Move back to previous task\n" .
+#                      "            ?, h[elp]          Display this help\n" .
+#                      "            q[uit], exit, bye  Exit\n\n" .
+#                      "Press [RET] to continue.\n";
 
 # ------------------------------------------------------------------------ Appearance
 my $prompt   = "trev> ";
@@ -286,6 +302,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
             <STDIN>;
         }
         $i--; next;                             # proceeds with same (current) task
+    }
+    elsif ( $line eq "?" || $line eq "h" || $line eq "help" ) {  # help request
+        print $STRING_MSG_HLP;
+        <STDIN>;
     }
     elsif ( $line eq "q" || $line eq "quit" || $line eq "exit" ) {  # quit request
         goingout( "$STRING_MSG_QIT$curr).\n" , 0 , 1 );             # exit
