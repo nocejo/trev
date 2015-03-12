@@ -90,21 +90,21 @@ my $STRING_MSG_HLP  = "Commands:   +                  Mark task\n" .
 #my $STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
 #my $STRING_MSG_NON = "\nNinguna\n\n";
 #my $STRING_MSG_QIT = "Terminado (tarea ";
-#my $STRING_MSG_RET = "Presione [RET] para continuar: ";
+#my $STRING_MSG_RET = "Presione [RET] para continuar. ";
 #my $STRING_MSG_STA = ": no aparece como visible.";
 #my $STRING_MSG_TIM = "Corriendo durante ";
 #my $STRING_MSG_UND = "No comprendido.";
 #my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
 #my $STRING_NOW_TXT = "Revisando";
 #my $STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
-#my $STRING_MSG_HLP  = "Commands:   +                  Mark task\n" .
-#                      "            -                  Unmark task\n" .
-#                      "            -id                Unmark task [id]\n" .
-#                      "            [RET]              Move to next task\n" .
-#                      "            b                  Move back to previous task\n" .
-#                      "            ?, h[elp]          Display this help\n" .
-#                      "            q[uit], exit, bye  Exit\n\n" .
-#                      "Press [RET] to continue.\n";
+#my $STRING_MSG_HLP  = "Commands:   +                  Marca la tarea\n" .
+#                      "            -                  Desmarca la tarea\n" .
+#                      "            -id                Desmarca la tarea [id]\n" .
+#                      "            [RET]              Continúa a la tarea siguiente\n" .
+#                      "            b                  Vuelve a la tarea previa\n" .
+#                      "            ?, h[elp]          Muestra esta ayuda\n" .
+#                      "            q[uit], exit, bye  Finaliza\n\n" .
+#                      "Presione [RET] para continuar.\n";
 
 # ------------------------------------------------------------------------ Appearance
 my $prompt   = "trev> ";
@@ -307,7 +307,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
         print $STRING_MSG_HLP;
         <STDIN>;
     }
-    elsif ( $line eq "q" || $line eq "quit" || $line eq "exit" ) {  # quit request
+    elsif ( $line eq "bye" || $line eq "q" || $line eq "quit" || $line eq "exit" ) {
         goingout( "$STRING_MSG_QIT$curr).\n" , 0 , 1 );             # exit
     }
     # ------------------------------------------------------------------ Command requested
