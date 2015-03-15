@@ -219,8 +219,17 @@ if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     }
 }
 if ( $start < 0 ) { $start = 0 }
+# ------------------------------------- Identifying the clear-screen command
+my $clearcommand = "clear" ;
+if ( $^O eq 'cygwin' ) {
+    $clearcommand = 'echo -e "\033[H\033[J"' ;
+}
+elsif ( $^O eq 'MSWin32' ) {
+    $clearcommand = 'cls' ;
+}
+# ------------------------------------------------------------------------------ Main Loop
 my $FLAGNTASKS = 0;                                 # flag: changed number of tasks
-for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # ----------------------------- Main Loop
+for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     my $line;
     my $curr = $tasks[$i];
 
@@ -242,7 +251,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {   # -----------------------------
       . " " x ( $barmaxl * ( 1 - $percent ) ) . "]";
     my $progtxt = $bar . " " . int( 100 * $percent ) . "%";
     substr( $progbar, 0, length($progtxt) ) = $progtxt;
-    system $^O eq 'cygwin' ? 'echo -e "\033[H\033[J"' : ( $^O eq 'MSWin32' ? 'cls' : 'clear' ) ;
+    system( $clearcommand ) ;
     print $progbar, "\n";
 
     # -------------------------------------------------------------------- Upper label
