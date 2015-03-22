@@ -18,23 +18,35 @@ Tasks list comes from a system call to task, obeying then the user preferred set
 
 # OPTIONS
 
+Command line structure: after the script name two optional arguments (see below) can follow, ++mark and start+, in this order; then a serie of option/argument can follow; and finally, an optional filter argument closes the invocation.  Order is mandatory. 
+
 ## ARGUMENTS
 
 No arguments are required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
 
 - [++mark]
 
-If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', marking action to 'modify +mark' and unmarking action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
+    If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', marking action to 'modify +mark' and unmarking action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
 
 - [start+]
 
-A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in 'trev.pl 113'.
+    A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in 'trev.pl 113'.
 
 - [filter]
 
-The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
+    The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
 
-Argument order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter can go in third, second or first place, depending if none or other(s) argument(s) appear.
+    ## COMMAND LINE OPTIONS
+
+- [-T /Additional text/]
+
+    Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \\!).
+
+- [-t /Additional text/]
+
+    Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \\!).
+
+Argument/option order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter must go at the end of the line.  Between arguments and filter options can be issued.
 
 ### EXAMPLES
 
@@ -42,35 +54,35 @@ See EXAMPLES below
 
 ## OPTIONS AT THE SCRIPT PROMPT
 
-After displaying a progress bar, marked tasks and the current task, the script prompts for an action. At this prompt you can issue this actions (entering them with [RET]):
+After displaying a progress bar, marked tasks and the current task, the script prompts for an action.  At this prompt you can issue this actions (entering them with [RET]):
 
 - [RET]
 
-[RETURN] or void line.  No action.  Proceeds to the next task.
+    [RETURN] or void line.  No action.  Proceeds to the next task.
 
 - b
 
-Goes back to the previous task.
+    Goes back to the previous task.
 
-- +
+- \+
 
-Marks task as 'active' (start-ing it, default) or with the requested marking tag.
+    Marks task as 'active' (start-ing it, default) or with the requested marking tag.
 
-- -
+- \-
 
-Unmarks current task and take it out of the 'marked' set.
+    Unmarks current task and take it out of the 'marked' set.
 
-- -n
+- \-n
 
-If '-' is followed by a number, as in '-156', unmarks the referred task number, not to current.
+    If '-' is followed by a number, as in '-156', unmarks the referred task number, not to current.
 
 - action [args]
 
-Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version. Those that need a task number operate on the current task. Can be shortened when not ambiguous.  Any action to perform on other task like in '175 delete' is not allowed.
+    Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version.  Those that need a task number operate on the current task.  Can be shortened when not ambiguous.   Any action to perform on other task like in '175 delete' is not allowed.
 
 - q, quit, exit, bye
 
-Terminate script execution.
+    Terminate script execution.
 
 
 
@@ -78,11 +90,11 @@ Terminate script execution.
 
 Taskwarrior 2.2.0+ must be installed.
 
-Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine . But some do not:
+Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine .  But some do not:
 
 - Term::ReadLine::Gnu
 
-Perl extension for the GNU Readline/History Library.
+    Perl extension for the GNU Readline/History Library.
 
 You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or get it from CPAN.
 
@@ -96,35 +108,41 @@ Currently you can choose between two localizations: en-US and es-ES.  This is do
 
 - trev.pl
 
-Reviews all visible tasks (user default filter), starts reviewing at first of them (default), mark/unmark current task with start/stop (default).
+    Reviews all visible tasks (user default filter), starts reviewing at first of them (default), mark/unmark current task with start/stop (default).
 
 - trev.pl ++week
 
-Set marking tag to +week and mark/unmark current task with 'modify +week'/'modify -week'.
+    Set marking tag to +week and mark/unmark current task with 'modify +week'/'modify -week'.
 
-- trev.pl ++calendula +ate_loops
+- trev.pl ++calendula +ate\_loops
 
-Mark/unmark using 'modify +/-calendula'; Reviews only ate_loops tagged tasks.
+    Mark/unmark using 'modify +/-calendula'; Reviews only ate\_loops tagged tasks.
 
 - trev.pl ++deleg 113+ pro:wp5
 
-Set marking tag to +deleg, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
+    Set marking tag to +deleg, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
 
 - trev.pl 113+ due:
 
-Processes only tasks without a due date.  Start at task 113.  Mark/unmark with start/stop and starts at the top of the list (defaults).
+    Processes only tasks without a due date.  Start at task 113.  Mark/unmark with start/stop and starts at the top of the list (defaults).
 
 - trev.pl ++NOW overdue
 
-Processes overdue tasks.  Mark/unmark with 'modify +/-NOW'.
+    Processes overdue tasks.  Mark/unmark with 'modify +/-NOW'.
 
 - trev.pl 113
 
-Reviews just task 113.  Start/stop for mark/unmark (default).
+    Reviews just task 113.  Start/stop for mark/unmark (default).
 
 - trev.pl amsterdam
 
-Review every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
+    Review every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
+
+- trev ++call -T 'Make these phone calls\\!' -t 'These are high-urgency actionable tasks\\!' urgency.over:12 +READY
+
+    Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the escaping necessary \\! .
+
+
 
 
 
@@ -150,7 +168,7 @@ Fidel Mato <fidel.mato at gmail.com>.
 
 # COPYRIGHT AND LICENSE
 
-Copyright 2015, Fidel Mato
+Copyright 2013, Fidel Mato
 
 trev.pl is released under the MIT license.
 

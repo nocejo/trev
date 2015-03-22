@@ -21,6 +21,8 @@ Tasks list comes from a system call to task, obeying then the user preferred set
 
 =head1 OPTIONS
 
+Command line structure: after the script name two optional arguments (see below) can follow, ++mark and start+, in this order; then a serie of option/argument can follow; and finally, an optional filter argument closes the invocation.  Order is mandatory. 
+
 =head2 ARGUMENTS
 
 No arguments are required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
@@ -39,9 +41,19 @@ A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '+
 
 The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
 
+=head2 COMMAND LINE OPTIONS
+
+=item [-T /Additional text/]
+
+Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \!).
+
+=item [-t /Additional text/]
+
+Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \!).
+
 =back
 
-Argument order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter can go in third, second or first place, depending if none or other(s) argument(s) appear.
+Argument/option order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter must go at the end of the line.  Between arguments and filter options can be issued.
 
 =head3 EXAMPLES
 
@@ -49,7 +61,7 @@ See EXAMPLES below
 
 =head2 OPTIONS AT THE SCRIPT PROMPT
 
-After displaying a progress bar, marked tasks and the current task, the script prompts for an action. At this prompt you can issue this actions (entering them with [RET]):
+After displaying a progress bar, marked tasks and the current task, the script prompts for an action.  At this prompt you can issue this actions (entering them with [RET]):
 
 =over 8
 
@@ -75,7 +87,7 @@ If '-' is followed by a number, as in '-156', unmarks the referred task number, 
 
 =item action [args]
 
-Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version. Those that need a task number operate on the current task. Can be shortened when not ambiguous.  Any action to perform on other task like in '175 delete' is not allowed.
+Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version.  Those that need a task number operate on the current task.  Can be shortened when not ambiguous.   Any action to perform on other task like in '175 delete' is not allowed.
 
 =item q, quit, exit, bye
 
@@ -88,7 +100,7 @@ Terminate script execution.
 
 Taskwarrior 2.2.0+ must be installed.
 
-Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine . But some do not:
+Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine .  But some do not:
 
 =over 4
 
@@ -141,6 +153,11 @@ Reviews just task 113.  Start/stop for mark/unmark (default).
 =item trev.pl amsterdam
 
 Review every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
+
+=item trev ++call -T 'Make these phone calls\!' -t 'These are high-urgency actionable tasks\!' urgency.over:12 +READY
+
+Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the escaping necessary \! .
+
 
 =back
 
