@@ -43,11 +43,11 @@ The rest of the line is taken as a taskwarrior filter --task number(s), report n
 
 =head2 COMMAND LINE OPTIONS
 
-=item [-T /Additional text/]
+=item -T /Additional text/
 
 Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \!).
 
-=item [-t /Additional text/]
+=item -t /Additional text/
 
 Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \!).
 
@@ -156,7 +156,7 @@ Review every task containing amsterdam in its description, starting at the top o
 
 =item trev ++call -T 'Make these phone calls\!' -t 'These are high-urgency actionable tasks\!' urgency.over:12 +READY
 
-Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the escaping necessary \! .
+Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping \! .
 
 
 =back

@@ -38,11 +38,11 @@ No arguments are required.  Optional arguments can be issued to set a marking ta
 
     ## COMMAND LINE OPTIONS
 
-- [-T /Additional text/]
+- -T /Additional text/
 
     Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \\!).
 
-- [-t /Additional text/]
+- -t /Additional text/
 
     Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \\!).
 
@@ -140,7 +140,7 @@ Currently you can choose between two localizations: en-US and es-ES.  This is do
 
 - trev ++call -T 'Make these phone calls\\!' -t 'These are high-urgency actionable tasks\\!' urgency.over:12 +READY
 
-    Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the escaping necessary \\! .
+    Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping \\! .
 
 
 
