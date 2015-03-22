@@ -43,6 +43,9 @@ use Term::ReadLine::Gnu;  # Perl extension for the GNU Readline/History Library.
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 
 # ------------------------------------------------------ selection and filter defaults
+my $prefilter = "";       # buffer to separe other arguments
+my $upaddtext = "";       # upper label additional text                 
+my $loaddtext = "";       # lower label additional text                 
 my $filter = "";
 
 my $seltag = "active";    # selection tag (fake, active is a report, not a tag)
@@ -187,7 +190,21 @@ if ( scalar(@ARGV) != 0 ) {
             goingout( "$start$STRING_MSG_STA\n" , 20 , 0 );           # exit on error
         }
     }
-    $filter = join( ' ', @ARGV );   # the rest of the line is considered filter
+    
+    $prefilter = join( ' ', @ARGV );   # the rest of the line is to be pre-filtered
+
+    # if -t /lower label additional text/ and/or -T /upper label additional text/ :
+    $prefilter =~ s/^\s*//;                      # strip leading blanks
+    for ( my $k = 0 ; $k < 6 ; $k++ ) {          # no more than 5 times - arbitrary
+        if ( !( $prefilter =~ m/^(-[t|T])\s+\/(.*?)\/.*/ ) ) { # '.*?' == non-greedy '.*'
+            last ;
+        }
+        my $torT = $1 ;
+        my $addt = $2 ; 
+        ( $torT eq '-t' ) ? ( $loaddtext = $addt ) : ( $upaddtext = $addt ) ;
+        $prefilter =~ s/\-?$torT\s+\/$addt\/\s*// ; # strip current -[t|T] + addt + blanks
+    }
+    $filter = $prefilter ;   # the rest of the line is considered filter(s)
 }
 
 # ----------------------------------------------------------------------------- gettasks()
@@ -255,7 +272,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     print $progbar, "\n";
 
     # -------------------------------------------------------------------- Upper label
-    my $uptxt = "$STRING_LBL_SEL ($seltag):";                # upper label text
+    my $uptxt = "$STRING_LBL_SEL ($seltag): $upaddtext";     # upper label text
     substr( $uplbl, 1, length($uptxt) ) = $uptxt;
     print colored( $uplbl, $lblstyle ), "\n";
 
@@ -265,7 +282,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
 
     # -------------------------------------------------------------------- Lower label
     my $lowtxt = "$STRING_NOW_TXT $filter";
-    $lowtxt = $lowtxt." ($progind):";
+    $lowtxt = $lowtxt." ($progind): $loaddtext";
     substr( $lowlbl, 1, length($lowtxt) ) = $lowtxt;
     print colored ( $lowlbl, $lblstyle ), "\n";              # lower label
     system("task $curr rc.verbose:off");                     # the task to review
