@@ -43,7 +43,6 @@ use Term::ReadLine::Gnu;  # Perl extension for the GNU Readline/History Library.
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 
 # ------------------------------------------------------ selection and filter defaults
-my $prefilter = "";       # buffer to separe other arguments
 my $upaddtext = "";       # upper label additional text                 
 my $loaddtext = "";       # lower label additional text                 
 my $filter = "";
@@ -166,10 +165,28 @@ my @nonumb = ( 'add', 'log', 'version', 'calendar' ,'undo' );
 # ---------------------------------------------------------------------- Parsing arguments
 my $start  = -1;
 
-# command line to parse: $ perl trev.pl [++seltag] [start+] [filter]
+# command line to parse: $ trev.pl [-t|-T text] [++seltag] [start+] [filter]
 if ( scalar(@ARGV) != 0 ) {
+    # ----------------------------------------------------------------- Options
+    while ( scalar(@ARGV) && $ARGV[0] =~ m/\-(.)/ ) {
+        shift( @ARGV ) ;
+        my $opt = $1 ;
+        if ( $opt eq 't' ) {
+            $loaddtext = $ARGV[0] ;
+            shift( @ARGV ) ;
+        }
+        elsif ( $opt eq 'T' ) {
+            $upaddtext = $ARGV[0] ;
+            shift( @ARGV ) ;
+        }
+        else {
+            goingout( "-$1: $STRING_MSG_UND\n" , 20 , 0 );
+        }
+    }
+
+    # ----------------------------------------------------------------- Arguments
     # if selection attribute requested: matches '++something'
-    if ( $ARGV[0] =~ m/\+\+(.+)/ ) {
+    if ( scalar(@ARGV) && $ARGV[0] =~ m/\+\+(.+)/ ) {
         $seltag = "+$1";           # tag that will be used for selection
         $on     = "modify +$1";    # select action
         $off    = "modify -$1";    # unselect action
@@ -190,21 +207,7 @@ if ( scalar(@ARGV) != 0 ) {
             goingout( "$start$STRING_MSG_STA\n" , 20 , 0 );           # exit on error
         }
     }
-    
-    $prefilter = join( ' ', @ARGV );   # the rest of the line is to be pre-filtered
-
-    # if -t /lower label additional text/ and/or -T /upper label additional text/ :
-    $prefilter =~ s/^\s*//;                      # strip leading blanks
-    for ( my $k = 0 ; $k < 6 ; $k++ ) {          # no more than 5 times - arbitrary
-        if ( !( $prefilter =~ m/^(-[t|T])\s+\/(.*?)\/.*/ ) ) { # '.*?' == non-greedy '.*'
-            last ;
-        }
-        my $torT = $1 ;
-        my $addt = $2 ; 
-        ( $torT eq '-t' ) ? ( $loaddtext = $addt ) : ( $upaddtext = $addt ) ;
-        $prefilter =~ s/\-?$torT\s+\/$addt\/\s*// ; # strip current -[t|T] + addt + blanks
-    }
-    $filter = $prefilter ;   # the rest of the line is considered filter(s)
+    $filter = join( ' ', @ARGV );   # the rest of the line is considered filter
 }
 
 # ----------------------------------------------------------------------------- gettasks()
