@@ -4,7 +4,7 @@ trev.pl - taskwarrior tasks reviewing script
 
 # SYNOPSIS
 
-perl trev.pl [++mark] [start+] [filter]
+perl trev.pl \[++mark\] \[start+\] \[filter\]
 
 # DESCRIPTION
 
@@ -16,37 +16,37 @@ At the script prompt the user can also include the current into a set of marked 
 
 Tasks list comes from a system call to task, obeying then the user preferred settings for visibility, order, decoration...
 
-# OPTIONS
+# OPTIONS/ARGUMENTS
 
-Command line structure: after the script name two optional arguments (see below) can follow, ++mark and start+, in this order; then a serie of option/argument can follow; and finally, an optional filter argument closes the invocation.  Order is mandatory. 
+Command line structure: after the script name a number of option/argument (e.g.: -T 'Make these calls!') can follow; then two optional arguments (see below) can follow, ++mark and start+, in this order; and finally, an optional filter argument closes the invocation.  Order is mandatory. 
+
+No options/arguments are required.  Options to set additional text in upper and/or lower labels con be issued. Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
+
+## COMMAND LINE OPTIONS
+
+- \-T 'Additional text'
+
+Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
+
+- \-t 'Additional text'
+
+Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Quotation marks are required if text contains blank spaces..
 
 ## ARGUMENTS
 
-No arguments are required.  Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
-
-- [++mark]
+- \[++mark\]
 
     If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', marking action to 'modify +mark' and unmarking action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
 
-- [start+]
+- \[start+\]
 
     A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in 'trev.pl 113'.
 
-- [filter]
+- \[filter\]
 
     The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
 
-    ## COMMAND LINE OPTIONS
-
-- -T /Additional text/
-
-    Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \\!).
-
-- -t /Additional text/
-
-    Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Some characters (as !) have a significance for the shell and must be escaped (as \\!).
-
-Argument/option order is mandatory: if a marking tag is specified it must be issued as the first argument; starting task number can be first (if no marking tag) or second (first is marking tag).  Filter must go at the end of the line.  Between arguments and filter options can be issued.
+Argument/option order is mandatory: option(s) must come first, if at all issued. If a marking tag is specified it must be issued as the first argument following options; starting task number can be first (if no marking tag) or second (first is marking tag) after options.  Filter must go at the end of the line.
 
 ### EXAMPLES
 
@@ -54,11 +54,11 @@ See EXAMPLES below
 
 ## OPTIONS AT THE SCRIPT PROMPT
 
-After displaying a progress bar, marked tasks and the current task, the script prompts for an action.  At this prompt you can issue this actions (entering them with [RET]):
+After displaying a progress bar, marked tasks and the current task, the script prompts for an action.  At this prompt you can issue this actions (entering them with \[RET\]):
 
-- [RET]
+- \[RET\]
 
-    [RETURN] or void line.  No action.  Proceeds to the next task.
+    \[RETURN\] or void line.  No action.  Proceeds to the next task.
 
 - b
 
@@ -76,7 +76,7 @@ After displaying a progress bar, marked tasks and the current task, the script p
 
     If '-' is followed by a number, as in '-156', unmarks the referred task number, not to current.
 
-- action [args]
+- action \[args\]
 
     Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version.  Those that need a task number operate on the current task.  Can be shortened when not ambiguous.   Any action to perform on other task like in '175 delete' is not allowed.
 
@@ -138,9 +138,9 @@ Currently you can choose between two localizations: en-US and es-ES.  This is do
 
     Review every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
 
-- trev ++call -T 'Make these phone calls\\!' -t 'These are high-urgency actionable tasks\\!' urgency.over:12 +READY
+- trev -T 'Make these phone calls\\!' -t 'These are high-urgency actionable tasks!' ++call  urgency.over:12 +READY
 
-    Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping \\! .
+    Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping quotation marks.
 
 
 
