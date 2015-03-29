@@ -1,5 +1,8 @@
 # ------------------------------------------------- default review
-﻿review.default.filter     = 
+review.default.L10N       = eng-USA
+review.default.viewinfo   = on
+﻿﻿﻿review.default.showtime   = on
+﻿﻿﻿review.default.filter     = 
 ﻿review.default.seltag     = 
 ﻿review.default.on         = start
 ﻿review.default.off        = stop
@@ -8,7 +11,6 @@
 ﻿review.default.lower      = 
 ﻿review.default.lblstyle   = reverse bold
 ﻿review.default.sepstyle   = underline bold
-﻿review.default.viewinfo   = on
 ﻿
 # ------------------------------------------------- weekly review
 review.weekly.filter     = due.before:tomorrow

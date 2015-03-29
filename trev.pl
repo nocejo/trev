@@ -33,100 +33,83 @@ use warnings;
 use utf8;
 binmode( STDOUT, ":utf8" );    # or use open ":utf8", ":std";
 
-use Term::ANSIColor;      # Color screen output using ANSI escape sequences
-use Term::ReadLine;       # Perl interface to various readline packages.
-use Term::ReadLine::Gnu;  # Perl extension for the GNU Readline/History Library.
-#use Term::UI;             # Term::ReadLine UI made easy
-
+use Term::ANSIColor;           # Color screen output using ANSI escape sequences
+use Term::ReadLine;            # Perl interface to various readline packages.
+use Term::ReadLine::Gnu;       # Perl extension for the GNU Readline/History Library.
+#use Term::UI;                 # Term::ReadLine UI made easy
 # use Term::ReadKey;        # MSWindows?
 use Cwd ;
 
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
+my $L10N      = "eng-USA";
+my $viewinfo  = "on";
+my $showtime  = "off";
 # ---------------------------------------------------------- selection and filter defaults
 my $filter    = "";
 my $seltag    = "active";            # selection tag (fake, active is a report, not a tag)
-my $on        = "start";     # select action
-my $off       = "stop";      # unselect action
-my $upper     = "";          # upper label additional text                 
-my $lower     = "";          # lower label additional text                 
+my $on        = "start";             # select action
+my $off       = "stop";              # unselect action
+my $upper     = "";                  # upper label additional text                 
+my $lower     = "";                  # lower label additional text                 
 # -------------------------------------------------- Appearance
-my $prompt    = "trev> " ;
-my $lblstyle  = "reverse bold" ;
-my $sepstyle  = "underline bold" ;
+my $prompt    = "trev> ";
+my $lblstyle  = "reverse bold";
+my $sepstyle  = "underline bold";
 
-# Uncomment STRINGs in your preferred localization ---------------------------------- L10N
-# ------------------------------------------------------------------------ en-US
-my $STRING_LBL_SEL  = "Selected";
-my $STRING_MSG_AMB  = "is ambiguous, can be:";
-my $STRING_MSG_END  = "Finished.";
-my $STRING_MSG_ERR  = "Warning: not completed";
-my $STRING_MSG_NFD  = "Current and next tasks not found.";
-my $STRING_MSG_NON  = "\nNone\n\n";
-my $STRING_MSG_QIT  = "Terminated (task ";
-my $STRING_MSG_RCN  = "rc file not found, going with hard wired defaults.";
-my $STRING_MSG_RET  = "Press [RET] to continue: ";
-my $STRING_MSG_STA  = ": doesn't appear as visible.";
-my $STRING_MSG_UND  = "Not understood.";
-my $STRING_MSG_TIM  = "Running for ";
-my $STRING_MSG_VER  = "Taskwarrior version must be 2.2.0 at least.";
-my $STRING_NOW_TXT  = "Reviewing";
-my $STRING_WRN_NUM  = "Changed number of tasks! > ";
-my $STRING_MSG_HLP  = "Commands:   +                  Mark task\n" .
-                      "            -                  Unmark task\n" .
-                      "            -id                Unmark task [id]\n" .
-                      "            [RET]              Move to next task\n" .
-                      "            b                  Move back to previous task\n" .
-                      "            ?, h[elp]          Display this help\n" .
-                      "            q[uit], exit, bye  Exit\n\n" .
-                      "Press [RET] to continue.\n";
-
-# ------------------------------------------------------------------------ es-ES
-#my $STRING_LBL_SEL = "Seleccionadas";
-#my $STRING_MSG_AMB = "es ambiguo, puede ser:";
-#my $STRING_MSG_END = "Finalizado.";
-#my $STRING_MSG_ERR = "Aviso: no se completa";
-#my $STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
-#my $STRING_MSG_NON = "\nNinguna\n\n";
-#my $STRING_MSG_QIT = "Terminado (tarea ";
-#my $STRING_MSG_RCN  ="fichero rc no encontrado, usando valores por defecto de script.";
-#my $STRING_MSG_RET = "Presione [RET] para continuar. ";
-#my $STRING_MSG_STA = ": no aparece como visible.";
-#my $STRING_MSG_TIM = "Corriendo durante ";
-#my $STRING_MSG_UND = "No comprendido.";
-#my $STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
-#my $STRING_NOW_TXT = "Revisando";
-#my $STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
-#my $STRING_MSG_HLP  = "Commands:   +                  Marca la tarea\n" .
-#                      "            -                  Desmarca la tarea\n" .
-#                      "            -id                Desmarca la tarea [id]\n" .
-#                      "            [RET]              Continúa a la tarea siguiente\n" .
-#                      "            b                  Vuelve a la tarea previa\n" .
-#                      "            ?, h[elp]          Muestra esta ayuda\n" .
-#                      "            q[uit], exit, bye  Finaliza\n\n" .
-#                      "Presione [RET] para continuar.\n";
-
+# ----------------------------------------------------------------------------------- L10N
+#if( $L10N eq "eng-USA" ) {         # -------------------------------- eng-USA
+my $STRING_LBL_SEL = "Selected";
+my $STRING_MSG_AMB = "is ambiguous, can be:";
+my $STRING_MSG_END = "Finished.";
+my $STRING_MSG_ERR = "Warning: not completed";
+my $STRING_MSG_NFD = "Current and next tasks not found.";
+my $STRING_MSG_NON = "\nNone\n\n";
+my $STRING_MSG_QIT = "Terminated (task ";
+my $STRING_MSG_RCN = "rc file not found, going with hard wired defaults.";
+my $STRING_MSG_RET = "Press [RET] to continue: ";
+my $STRING_MSG_STA = ": doesn't appear as visible.";
+my $STRING_MSG_UND = "Not understood.";
+my $STRING_MSG_TIM = "Running for ";
+my $STRING_MSG_VER = "Taskwarrior version must be 2.2.0 at least.";
+my $STRING_NOW_TXT = "Reviewing";
+my $STRING_WRN_NUM = "Changed number of tasks! > ";
+my $STRING_MSG_HLP = "Commands:   +                  Mark task\n" .
+                     "            -                  Unmark task\n" .
+                     "            -id                Unmark task [id]\n" .
+                     "            [RET]              Move to next task\n" .
+                     "            b                  Move back to previous task\n" .
+                     "            ?, h[elp]          Display this help\n" .
+                     "            q[uit], exit, bye  Exit\n\n" .
+                     "Press [RET] to continue.\n";
+#}
+if( $L10N eq "esp-ESP" ) {         # -------------------------------- esp-ESP
+$STRING_LBL_SEL = "Seleccionadas";
+$STRING_MSG_AMB = "es ambiguo, puede ser:";
+$STRING_MSG_END = "Finalizado.";
+$STRING_MSG_ERR = "Aviso: no se completa";
+$STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
+$STRING_MSG_NON = "\nNinguna\n\n";
+$STRING_MSG_QIT = "Terminado (tarea ";
+$STRING_MSG_RCN = "fichero rc no encontrado, usando valores por defecto de script.";
+$STRING_MSG_RET = "Presione [RET] para continuar. ";
+$STRING_MSG_STA = ": no aparece como visible.";
+$STRING_MSG_TIM = "Corriendo durante ";
+$STRING_MSG_UND = "No comprendido.";
+$STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
+$STRING_NOW_TXT = "Revisando";
+$STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
+$STRING_MSG_HLP = "Commands:   +                  Marca la tarea\n" .
+                  "            -                  Desmarca la tarea\n" .
+                  "            -id                Desmarca la tarea [id]\n" .
+                  "            [RET]              Continúa a la tarea siguiente\n" .
+                  "            b                  Vuelve a la tarea previa\n" .
+                  "            ?, h[elp]          Muestra esta ayuda\n" .
+                  "            q[uit], exit, bye  Finaliza\n\n" .
+                  "Presione [RET] para continuar.\n";
+}
 # < < < < < < < < < < < < < < <  Configuration < < < < < < < < < < < < < < < < < < < < < <
 
 my $intime = time();                                                  # Record time
-
-# ----------------------------------------------------------------------------- goingout()
-# goingout( $msg , $retval , $showtime );  does not return, exit function.
-# -----------------------------------------------------------------------------
-sub goingout {
-    use integer;
-    my $msg = shift; my $retval = shift; my $showtime = shift;
-
-    print( $msg );
-    if ( $showtime == 1 ) {
-        $_ = time() - $intime;
-        my $s = $_ % 60; $_ /= 60;
-        my $m = $_ % 60; $_ /= 60; $m = ($m == 0) ? "" : $m."m " ;
-        my $h = $_ % 24; $_ /= 24; $h = ($h == 0) ? "" : $h."h " ;
-        my $d = $_;                $d = ($d == 0) ? "" : $d."d " ;
-        print ( $STRING_MSG_TIM.$d.$h.$m.$s."s\n" );
-    }
-    exit( $retval );
-}
 
 # -------------------------------------------------------------------------- Version check
 my ( $major, $minor ) = split( /\./, `task --version` );
@@ -343,7 +326,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
         <STDIN>;
     }
     elsif ( $line eq "bye" || $line eq "q" || $line eq "quit" || $line eq "exit" ) {
-        goingout( "$STRING_MSG_QIT$curr).\n" , 0 , 1 );             # exit
+        goingout( "$STRING_MSG_QIT$curr).\n" , 0 , $showtime );             # exit
     }
     # ------------------------------------------------------------------ Command requested
     else {
@@ -445,7 +428,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
             $i--; next;                             # proceeds with same (current) task
         }
         elsif ( $nextuuid eq "no-next-task" ) {     # was the last and not found: exit
-            goingout( "$STRING_MSG_END\n" , 0 , 1 );
+            goingout( "$STRING_MSG_END\n" , 0 , $showtime );
         }
         # current uuid not found and was not the last task:
         for ( my $k = 0 ; $k < $nwtasks ; $k++ ) {  # search next uuid in new list
@@ -462,12 +445,30 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
             $i--; next;                             # proceeds with next task
         }
         else {               # was not the last, not found and next not found: exit
-            goingout( "$STRING_MSG_NFD\n" , 0 , 1 );
+            goingout( "$STRING_MSG_NFD\n" , 0 , $showtime );
         }
     }
 }   # -------------------------------------------------------------------------- Main Loop
 goingout( "$STRING_MSG_END\n" , 0 , 1 );    # bye
 
+# ----------------------------------------------------------------------------- goingout()
+# goingout( $msg , $retval , $showtime );  does not return, exit function.
+# -----------------------------------------------------------------------------
+sub goingout {
+    use integer;
+    my $msg = shift; my $retval = shift; my $showtime = shift;
+
+    print( $msg );
+    if ( $showtime eq "on" ) {
+        $_ = time() - $intime;
+        my $s = $_ % 60; $_ /= 60;
+        my $m = $_ % 60; $_ /= 60; $m = ($m == 0) ? "" : $m."m " ;
+        my $h = $_ % 24; $_ /= 24; $h = ($h == 0) ? "" : $h."h " ;
+        my $d = $_;                $d = ($d == 0) ? "" : $d."d " ;
+        print ( $STRING_MSG_TIM.$d.$h.$m.$s."s\n" );
+    }
+    exit( $retval );
+}
 __END__
 # -------------------------------------------------------------------------------- __END__
 # See trev.pod for documentation
