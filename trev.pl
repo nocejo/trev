@@ -39,17 +39,17 @@ use Term::ReadLine::Gnu;  # Perl extension for the GNU Readline/History Library.
 #use Term::UI;             # Term::ReadLine UI made easy
 
 # use Term::ReadKey;        # MSWindows?
+use Cwd ;
 
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 
 # ------------------------------------------------------ selection and filter defaults
-my $upaddtext = "";       # upper label additional text                 
-my $loaddtext = "";       # lower label additional text                 
-my $filter = "";
-
-my $seltag = "active";    # selection tag (fake, active is a report, not a tag)
-my $on     = "start";     # select action
-my $off    = "stop";      # unselect action
+my $filter    = "";
+my $seltag    = "active";    # selection tag (fake, active is a report, not a tag)
+my $on        = "start";     # select action
+my $off       = "stop";      # unselect action
+my $upper     = "";          # upper label additional text                 
+my $lower     = "";          # lower label additional text                 
 
 #my $seltag = "+w";        # selection tag  , weekly review.
 #my $on     = "mod +w";    # select action
@@ -68,6 +68,7 @@ my $STRING_MSG_ERR  = "Warning: not completed";
 my $STRING_MSG_NFD  = "Current and next tasks not found.";
 my $STRING_MSG_NON  = "\nNone\n\n";
 my $STRING_MSG_QIT  = "Terminated (task ";
+my $STRING_MSG_RCN  = "rc file not found, going with hard wired defaults.";
 my $STRING_MSG_RET  = "Press [RET] to continue: ";
 my $STRING_MSG_STA  = ": doesn't appear as visible.";
 my $STRING_MSG_UND  = "Not understood.";
@@ -92,6 +93,7 @@ my $STRING_MSG_HLP  = "Commands:   +                  Mark task\n" .
 #my $STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
 #my $STRING_MSG_NON = "\nNinguna\n\n";
 #my $STRING_MSG_QIT = "Terminado (tarea ";
+#my $STRING_MSG_RCN  ="fichero rc no encontrado, usando valores por defecto de script.";
 #my $STRING_MSG_RET = "Presione [RET] para continuar. ";
 #my $STRING_MSG_STA = ": no aparece como visible.";
 #my $STRING_MSG_TIM = "Corriendo durante ";
@@ -140,6 +142,20 @@ sub goingout {
 my ( $major, $minor ) = split( /\./, `task --version` );
 if ( $major < 2 || ($major == 2 && $minor < 2)) { goingout( "$STRING_MSG_VER\n" , 10 , 0 ); } # exit
 
+# -------------------------------------------------------------------------------- rc file
+# -------------------------------------------------- locating the rc file (or none)
+my $rcfilepath = "" ;
+my $cwd      = getcwd() ;                                      # current working dir
+my $userhome = $ENV{"HOME"} ;
+my @rcpaths  = ( "$cwd/trevrc" , "$userhome/.trevrc" , "$userhome/.task/trevrc" ) ;
+foreach my $path ( @rcpaths ) {
+    if ( -e $path ) {
+        $rcfilepath = $path ;
+        last ;
+    }
+}
+if( $rcfilepath eq "" ) { print( "\nWarning: $STRING_MSG_RCN\n\n" ) }
+
 # ------------------------------------------------------------------ Term::Readline object
 my $term = Term::ReadLine->new('');
 $term->ornaments(0);    # disable prompt default styling (underline)
@@ -172,11 +188,11 @@ if ( scalar(@ARGV) != 0 ) {
         shift( @ARGV ) ;
         my $opt = $1 ;
         if ( $opt eq 't' ) {
-            $loaddtext = $ARGV[0] ;
+            $lower = $ARGV[0] ;
             shift( @ARGV ) ;
         }
         elsif ( $opt eq 'T' ) {
-            $upaddtext = $ARGV[0] ;
+            $upper = $ARGV[0] ;
             shift( @ARGV ) ;
         }
         else {
@@ -275,7 +291,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     print $progbar, "\n";
 
     # -------------------------------------------------------------------- Upper label
-    my $uptxt = "$STRING_LBL_SEL ($seltag): $upaddtext";     # upper label text
+    my $uptxt = "$STRING_LBL_SEL ($seltag): $upper";     # upper label text
     substr( $uplbl, 1, length($uptxt) ) = $uptxt;
     print colored( $uplbl, $lblstyle ), "\n";
 
@@ -285,7 +301,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
 
     # -------------------------------------------------------------------- Lower label
     my $lowtxt = "$STRING_NOW_TXT $filter";
-    $lowtxt = $lowtxt." ($progind): $loaddtext";
+    $lowtxt = $lowtxt." ($progind): $lower";
     substr( $lowlbl, 1, length($lowtxt) ) = $lowtxt;
     print colored ( $lowlbl, $lblstyle ), "\n";              # lower label
     system("task $curr rc.verbose:off");                     # the task to review
