@@ -42,24 +42,19 @@ use Term::ReadLine::Gnu;  # Perl extension for the GNU Readline/History Library.
 use Cwd ;
 
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
-
-# ------------------------------------------------------ selection and filter defaults
+# ---------------------------------------------------------- selection and filter defaults
 my $filter    = "";
-my $seltag    = "active";    # selection tag (fake, active is a report, not a tag)
+my $seltag    = "active";            # selection tag (fake, active is a report, not a tag)
 my $on        = "start";     # select action
 my $off       = "stop";      # unselect action
 my $upper     = "";          # upper label additional text                 
 my $lower     = "";          # lower label additional text                 
+# -------------------------------------------------- Appearance
+my $prompt    = "trev> " ;
+my $lblstyle  = "reverse bold" ;
+my $sepstyle  = "underline bold" ;
 
-#my $seltag = "+w";        # selection tag  , weekly review.
-#my $on     = "mod +w";    # select action
-#my $off    = "mod -w";    # unselect action
-
-#my $seltag = "+someday";     # selection tag
-#my $on     = "mod +someday"; # select action
-#my $off    = "mod -someday"; # unselect action
-
-# Uncomment STRINGs in your preferred localization ------------------------------ L10N
+# Uncomment STRINGs in your preferred localization ---------------------------------- L10N
 # ------------------------------------------------------------------------ en-US
 my $STRING_LBL_SEL  = "Selected";
 my $STRING_MSG_AMB  = "is ambiguous, can be:";
@@ -109,11 +104,6 @@ my $STRING_MSG_HLP  = "Commands:   +                  Mark task\n" .
 #                      "            ?, h[elp]          Muestra esta ayuda\n" .
 #                      "            q[uit], exit, bye  Finaliza\n\n" .
 #                      "Presione [RET] para continuar.\n";
-
-# ------------------------------------------------------------------------ Appearance
-my $prompt   = "trev> ";
-my $lblstyle = "reverse bold";
-my $sepstyle = "underline bold";
 
 # < < < < < < < < < < < < < < <  Configuration < < < < < < < < < < < < < < < < < < < < < <
 

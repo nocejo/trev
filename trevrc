@@ -4,12 +4,12 @@
 ﻿review.default.on         = start
 ﻿review.default.off        = stop
 ﻿review.default.prompt     = 'trev> '   # quotes to remark blank
+﻿review.default.upper      = 
+﻿review.default.lower      = 
 ﻿review.default.lblstyle   = reverse bold
 ﻿review.default.sepstyle   = underline bold
 ﻿review.default.viewinfo   = on
-﻿review.default.upper      = 
-﻿review.default.lower      = 
-
+﻿
 # ------------------------------------------------- weekly review
 review.weekly.filter     = due.before:tomorrow
 review.weekly.seltag     = +w
