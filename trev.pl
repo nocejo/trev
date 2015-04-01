@@ -66,6 +66,7 @@ my $STRING_MSG_NFD = "Current and next tasks not found.";
 my $STRING_MSG_NON = "\nNone\n\n";
 my $STRING_MSG_QIT = "Terminated (task ";
 my $STRING_MSG_RCN = "rc file not found, going with hard wired defaults.";
+my $STRING_MSG_RCO = "Error opening rc file:";
 my $STRING_MSG_RET = "Press [RET] to continue: ";
 my $STRING_MSG_STA = ": doesn't appear as visible.";
 my $STRING_MSG_UND = "Not understood.";
@@ -91,6 +92,7 @@ $STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
 $STRING_MSG_NON = "\nNinguna\n\n";
 $STRING_MSG_QIT = "Terminado (tarea ";
 $STRING_MSG_RCN = "fichero rc no encontrado, usando valores por defecto de script.";
+$STRING_MSG_RCO = "Error abriendo el fichero rc:";
 $STRING_MSG_RET = "Presione [RET] para continuar. ";
 $STRING_MSG_STA = ": no aparece como visible.";
 $STRING_MSG_TIM = "Corriendo durante ";
@@ -127,7 +129,19 @@ foreach my $path ( @rcpaths ) {
         last ;
     }
 }
-if( $rcfilepath eq "" ) { print( "\nWarning: $STRING_MSG_RCN\n\n" ) }
+if( $rcfilepath eq "" ) {
+    print( "\nWarning: $STRING_MSG_RCN\n\n" ) ;
+}
+else { # ------------------------------------------------------- Reading rc
+    open( IN , $rcfilepath ) ||
+        goingout( "$STRING_MSG_RCO $rcfilepath\n" , 20 , 0 ) ;
+    while( <IN> ) {
+        chomp ;
+        if( m/^\s*$/ || m/^\s*#/ ) { next }  # blank lines and comments out
+        print( $_ , "\n" ) ; # DEBUG
+    }
+    close IN ;
+}
 
 # ------------------------------------------------------------------ Term::Readline object
 my $term = Term::ReadLine->new('');
