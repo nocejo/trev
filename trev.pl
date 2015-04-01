@@ -37,8 +37,9 @@ use Term::ANSIColor;           # Color screen output using ANSI escape sequences
 use Term::ReadLine;            # Perl interface to various readline packages.
 use Term::ReadLine::Gnu;       # Perl extension for the GNU Readline/History Library.
 #use Term::UI;                 # Term::ReadLine UI made easy
-# use Term::ReadKey;        # MSWindows?
-use Cwd ;
+#use Term::ReadKey;        # MSWindows?
+use File::Basename;
+my $scriptdir = dirname(__FILE__);
 
 # > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
 my $L10N      = "eng-USA";
@@ -120,9 +121,8 @@ if ( $major < 2 || ($major == 2 && $minor < 2)) { goingout( "$STRING_MSG_VER\n" 
 # -------------------------------------------------------------------------------- rc file
 # -------------------------------------------------- locating the rc file (or none)
 my $rcfilepath = "" ;
-my $cwd      = getcwd() ;                                      # current working dir
 my $userhome = $ENV{"HOME"} ;
-my @rcpaths  = ( "$cwd/trevrc" , "$userhome/.trevrc" , "$userhome/.task/trevrc" ) ;
+my @rcpaths  = ( "$userhome/.task/trevrc" , "$userhome/.trevrc" , "$scriptdir/trevrc" ) ;
 foreach my $path ( @rcpaths ) {
     if ( -e $path ) {
         $rcfilepath = $path ;
@@ -242,6 +242,10 @@ if ( $start > 0 ) {  # first arg numeric: start at this task number. Find order.
     }
 }
 if ( $start < 0 ) { $start = 0 }
+
+# ------------------------------------------------ Reporting about rc file
+print( "\nUsing settings from: $rcfilepath\n" ) ;
+
 # ------------------------------------- Identifying the clear-screen command
 my $clearcommand = "clear" ;
 if ( $^O eq 'cygwin' ) {
