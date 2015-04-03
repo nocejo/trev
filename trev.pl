@@ -61,6 +61,20 @@ my $sepstyle  = "underline bold";
 
 #  < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < Configuration
 
+# ------------------------------------------------------------------------ Allowed Actions
+# These actions don't change the list of tasks (total number):
+my @allow = (
+    'annotate',    'append',  'denotate', 'edit',
+    'information', 'log',     'prepend',  'start',
+    'stop',        'version', 'calendar'
+);
+
+# These actions can change the list of tasks (total number):
+my @allowch = ( 'add', 'delete', 'done', 'modify', 'duplicate','undo' );
+
+# These actions don't need a task number in the command line:
+my @nonumb = ( 'add', 'log', 'version', 'calendar' ,'undo' );
+
 # ----------------------------------------------------------------------------------- L10N
 #if( $L10N eq "eng-USA" ) {         # -------------------------------- eng-USA (default)
 my $STRING_LBL_SEL = "Selected";
@@ -115,60 +129,11 @@ $STRING_MSG_HLP = "Commands:   +                  Marca la tarea\n" .
                   "Presione [RET] para continuar.\n";
 }
 
-my $intime = time();                                                  # Record time
-
-# -------------------------------------------------------------------------- Version check
+# -------------------------------------------------------------- Taskwarrior Version check
 my ( $major, $minor ) = split( /\./, `task --version` );
 if ( $major < 2 || ($major == 2 && $minor < 2)) { goingout( "$STRING_MSG_VER\n" , 10 , "off" ); } # exit
 
-# -------------------------------------------------------------------------------- rc file
-# -------------------------------------------------- locating the rc file (or none)
-my $rcfilepath = "" ;
-my $userhome = $ENV{"HOME"} ;
-my @rcpaths  = ( "$userhome/.task/trevrc" , "$userhome/.trevrc" , "$scriptdir/trevrc" ) ;
-foreach my $path ( @rcpaths ) {
-    if ( -e $path ) {
-        $rcfilepath = $path ;
-        last ;
-    }
-}
-if( $rcfilepath eq "" ) {
-    print( "\nWarning: $STRING_MSG_RCN\n\n" ) ;
-}
-else { # ------------------------------------------------------- Reading rc
-    open( IN , $rcfilepath ) ||
-        goingout( "$STRING_MSG_RCO $rcfilepath\n" , 20 , "off" ) ;
-    while( <IN> ) {
-        chomp ;
-        if( m/^\s*$/ || m/^\s*#/ ) { next }  # blank lines and comments out
-        print( $_ , "\n" ) ; # DEBUG
-    }
-    close IN ;
-}
-
-# ------------------------------------------------------------------ Term::Readline object
-my $term = Term::ReadLine->new('');
-$term->ornaments(0);    # disable prompt default styling (underline)
-
-#my %features = %{$term->Features};
-#print "Features supported by ",$term->ReadLine,"\n";
-#foreach (sort keys %features) { print "\t$_ => \t$features{$_}\n"; }; exit 0;
-
-# ------------------------------------------------------------------------ Allowed Actions
-# These actions don't change the list of tasks (total number):
-my @allow = (
-    'annotate',    'append',  'denotate', 'edit',
-    'information', 'log',     'prepend',  'start',
-    'stop',        'version', 'calendar'
-);
-
-# These actions can change the list of tasks (total number):
-my @allowch = ( 'add', 'delete', 'done', 'modify', 'duplicate','undo' );
-
-# These actions don't need a task number in the command line:
-my @nonumb = ( 'add', 'log', 'version', 'calendar' ,'undo' );
-
-# ---------------------------------------------------------------------- Parsing arguments
+# --------------------------------------------------------- Parsing command line arguments
 # command line to parse: $ trev.pl [-t|-T text] [++seltag] [start+] [filter]
 if ( scalar(@ARGV) != 0 ) {
     # ----------------------------------------------------------------- Options
@@ -213,6 +178,41 @@ if ( scalar(@ARGV) != 0 ) {
     }
     $filter = join( ' ', @ARGV );   # the rest of the line is considered filter
 }
+
+# -------------------------------------------------------------------------------- rc file
+# -------------------------------------------------- locating the rc file (or none)
+my $rcfilepath = "" ;
+my $userhome = $ENV{"HOME"} ;
+my @rcpaths  = ( "$userhome/.task/trevrc" , "$userhome/.trevrc" , "$scriptdir/trevrc" ) ;
+foreach my $path ( @rcpaths ) {
+    if ( -e $path ) {
+        $rcfilepath = $path ;
+        last ;
+    }
+}
+if( $rcfilepath eq "" ) {
+    print( "\nWarning: $STRING_MSG_RCN\n\n" ) ;
+}
+else { # ------------------------------------------------------- Reading rc
+    open( IN , $rcfilepath ) ||
+        goingout( "$STRING_MSG_RCO $rcfilepath\n" , 20 , "off" ) ;
+    while( <IN> ) {
+        chomp ;
+        if( m/^\s*$/ || m/^\s*#/ ) { next }  # blank lines and comments out
+        print( $_ , "\n" ) ; # DEBUG
+    }
+    close IN ;
+}
+
+# ------------------------------------------------------------------ Term::Readline object
+my $intime = time();                                                  # Record time
+
+my $term = Term::ReadLine->new('');
+$term->ornaments(0);    # disable prompt default styling (underline)
+
+#my %features = %{$term->Features};
+#print "Features supported by ",$term->ReadLine,"\n";
+#foreach (sort keys %features) { print "\t$_ => \t$features{$_}\n"; }; exit 0;
 
 # ----------------------------------------------------------- Preparing Main loop Entrance
 my $thisuuid;
