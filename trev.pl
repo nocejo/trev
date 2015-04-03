@@ -214,19 +214,6 @@ if ( scalar(@ARGV) != 0 ) {
     $filter = join( ' ', @ARGV );   # the rest of the line is considered filter
 }
 
-# ----------------------------------------------------------------------------- gettasks()
-# @tasks = gettasks( );
-# -----------------------------------------------------------------------------
-sub gettasks {
-    my @tasks;
-    foreach my $line (`task $filter rc.verbose:off`) {
-        if ( $line =~ /^\s{0,3}(\d+)/ ) { # digit(s) sequence after 1 to 3 blank spaces
-            push( @tasks, $1 );
-        }
-    }
-    return @tasks;
-}
-
 # ----------------------------------------------------------- Preparing Main loop Entrance
 my $thisuuid;
 my $nextuuid;
@@ -469,6 +456,19 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     }
 }   # -------------------------------------------------------------------------- Main Loop
 goingout( "$STRING_MSG_END\n" , 0 , $showtime );    # bye
+
+# ----------------------------------------------------------------------------- gettasks()
+# @tasks = gettasks( );
+# -----------------------------------------------------------------------------
+sub gettasks {
+    my @tasks;
+    foreach my $line (`task $filter rc.verbose:off`) {
+        if ( $line =~ /^\s{0,3}(\d+)/ ) { # digit(s) sequence after 1 to 3 blank spaces
+            push( @tasks, $1 );
+        }
+    }
+    return @tasks;
+}
 
 # ----------------------------------------------------------------------------- goingout()
 # goingout( $msg , $retval , $showtime );  does not return, exit function.
