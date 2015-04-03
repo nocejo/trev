@@ -39,26 +39,30 @@ use Term::ReadLine::Gnu;       # Perl extension for the GNU Readline/History Lib
 #use Term::UI;                 # Term::ReadLine UI made easy
 #use Term::ReadKey;        # MSWindows?
 use File::Basename;
-my $scriptdir = dirname(__FILE__);
+my $scriptdir = dirname(__FILE__);   # locating the script dir
 
-# > > > > > > > > > > > > > > >  Configuration > > > > > > > > > > > > > > > > > > > > > >
-my $L10N      = "eng-USA";
-my $viewinfo  = "on";
-my $showtime  = "off";
-# ---------------------------------------------------------- selection and filter defaults
-my $filter    = "";
+#  Configuration > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > >
+# -------------------------------------------------- Parameter hard-wired defaults
 my $seltag    = "active";            # selection tag (fake, active is a report, not a tag)
 my $on        = "start";             # select action
 my $off       = "stop";              # unselect action
+my $start     = -1;                  # starting task; initial value
+my $filter    = "";
 my $upper     = "";                  # upper label additional text                 
 my $lower     = "";                  # lower label additional text                 
-# -------------------------------------------------- Appearance
+
+# -------------------------------------------------- Behavior and Appearance
+my $L10N      = "eng-USA";
+my $viewinfo  = "on";
+my $showtime  = "on";
 my $prompt    = "trev> ";
 my $lblstyle  = "reverse bold";
 my $sepstyle  = "underline bold";
 
+#  < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < Configuration
+
 # ----------------------------------------------------------------------------------- L10N
-#if( $L10N eq "eng-USA" ) {         # -------------------------------- eng-USA
+#if( $L10N eq "eng-USA" ) {         # -------------------------------- eng-USA (default)
 my $STRING_LBL_SEL = "Selected";
 my $STRING_MSG_AMB = "is ambiguous, can be:";
 my $STRING_MSG_END = "Finished.";
@@ -110,7 +114,6 @@ $STRING_MSG_HLP = "Commands:   +                  Marca la tarea\n" .
                   "            q[uit], exit, bye  Finaliza\n\n" .
                   "Presione [RET] para continuar.\n";
 }
-# < < < < < < < < < < < < < < <  Configuration < < < < < < < < < < < < < < < < < < < < < <
 
 my $intime = time();                                                  # Record time
 
@@ -166,8 +169,6 @@ my @allowch = ( 'add', 'delete', 'done', 'modify', 'duplicate','undo' );
 my @nonumb = ( 'add', 'log', 'version', 'calendar' ,'undo' );
 
 # ---------------------------------------------------------------------- Parsing arguments
-my $start  = -1;
-
 # command line to parse: $ trev.pl [-t|-T text] [++seltag] [start+] [filter]
 if ( scalar(@ARGV) != 0 ) {
     # ----------------------------------------------------------------- Options
