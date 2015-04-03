@@ -119,7 +119,7 @@ my $intime = time();                                                  # Record t
 
 # -------------------------------------------------------------------------- Version check
 my ( $major, $minor ) = split( /\./, `task --version` );
-if ( $major < 2 || ($major == 2 && $minor < 2)) { goingout( "$STRING_MSG_VER\n" , 10 , 0 ); } # exit
+if ( $major < 2 || ($major == 2 && $minor < 2)) { goingout( "$STRING_MSG_VER\n" , 10 , "off" ); } # exit
 
 # -------------------------------------------------------------------------------- rc file
 # -------------------------------------------------- locating the rc file (or none)
@@ -137,7 +137,7 @@ if( $rcfilepath eq "" ) {
 }
 else { # ------------------------------------------------------- Reading rc
     open( IN , $rcfilepath ) ||
-        goingout( "$STRING_MSG_RCO $rcfilepath\n" , 20 , 0 ) ;
+        goingout( "$STRING_MSG_RCO $rcfilepath\n" , 20 , "off" ) ;
     while( <IN> ) {
         chomp ;
         if( m/^\s*$/ || m/^\s*#/ ) { next }  # blank lines and comments out
@@ -184,7 +184,7 @@ if ( scalar(@ARGV) != 0 ) {
             shift( @ARGV ) ;
         }
         else {
-            goingout( "-$1: $STRING_MSG_UND\n" , 20 , 0 );
+            goingout( "-$1: $STRING_MSG_UND\n" , 20 , "off" );
         }
     }
 
@@ -208,7 +208,7 @@ if ( scalar(@ARGV) != 0 ) {
 
         # system() returns a false value on success, then:
         if ( $sysret != 0 ) {
-            goingout( "$start$STRING_MSG_STA\n" , 20 , 0 );           # exit on error
+            goingout( "$start$STRING_MSG_STA\n" , 20 , "off" );           # exit on error
         }
     }
     $filter = join( ' ', @ARGV );   # the rest of the line is considered filter
@@ -468,7 +468,7 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
         }
     }
 }   # -------------------------------------------------------------------------- Main Loop
-goingout( "$STRING_MSG_END\n" , 0 , 1 );    # bye
+goingout( "$STRING_MSG_END\n" , 0 , $showtime );    # bye
 
 # ----------------------------------------------------------------------------- goingout()
 # goingout( $msg , $retval , $showtime );  does not return, exit function.
