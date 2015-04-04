@@ -86,6 +86,7 @@ my $STRING_MSG_NON = "\nNone\n\n";
 my $STRING_MSG_QIT = "Terminated (task ";
 my $STRING_MSG_RCN = "rc file not found, going with hard wired defaults.";
 my $STRING_MSG_RCO = "Error opening rc file:";
+my $STRING_MSG_RCC = "Erroneous construction in:";
 my $STRING_MSG_RET = "Press [RET] to continue: ";
 my $STRING_MSG_STA = ": doesn't appear as visible.";
 my $STRING_MSG_UND = "Not understood.";
@@ -112,6 +113,7 @@ $STRING_MSG_NON = "\nNinguna\n\n";
 $STRING_MSG_QIT = "Terminado (tarea ";
 $STRING_MSG_RCN = "fichero rc no encontrado, usando valores por defecto de script.";
 $STRING_MSG_RCO = "Error abriendo el fichero rc:";
+$STRING_MSG_RCC = "Construcción errónea en:";
 $STRING_MSG_RET = "Presione [RET] para continuar. ";
 $STRING_MSG_STA = ": no aparece como visible.";
 $STRING_MSG_TIM = "Corriendo durante ";
@@ -195,13 +197,62 @@ if( $rcfilepath eq "" ) {
 }
 else { # ------------------------------------------------------- Reading rc
     open( IN , $rcfilepath ) ||
-        goingout( "$STRING_MSG_RCO $rcfilepath\n" , 20 , "off" ) ;
+        goingout( "$STRING_MSG_RCO $rcfilepath\n" , 30 , "off" ) ;
+    my $canbemode = "" ;
+    if( $filter eq "" ) {
+        $canbemode = "default" ;
+    }
+    elsif( $filter =~ m/(^\w+$)/ ) {         # just one word
+        $canbemode = $1 ;
+    }
+    
     while( <IN> ) {
         chomp ;
         if( m/^\s*$/ || m/^\s*#/ ) { next }  # blank lines and comments out
-        print( $_ , "\n" ) ; # DEBUG
+#        print( $_ , "\n" ) ; # DEBUG
+        if( m/^\s*review.(\w+).(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line constuct
+            if( $1 eq $canbemode ) {
+#                print( "|$1|$2|$3|\n" ) ;
+                my $param = $2 ;
+                my $value = $3 ;
+                $value =~ s/\s*$// ;
+                $value =~ s/^[\'|\"]// ; 
+                $value =~ s/[\'|\"]$// ; 
+                if(    $param eq "seltag"   ) { $seltag   = $value }
+                elsif( $param eq "on"       ) { $on       = $value }
+                elsif( $param eq "off"      ) { $off      = $value }
+                elsif( $param eq "filter"   ) { $filter   = $value }
+                elsif( $param eq "upper"    ) { $upper    = $value }
+                elsif( $param eq "lower"    ) { $lower    = $value }
+                elsif( $param eq "L10N"     ) { $L10N     = $value }
+                elsif( $param eq "viewinfo" ) { $viewinfo = $value }
+                elsif( $param eq "showtime" ) { $showtime = $value }
+                elsif( $param eq "prompt"   ) { $prompt   = $value }
+                elsif( $param eq "lblstyle" ) { $lblstyle = $value }
+                elsif( $param eq "sepstyle" ) { $sepstyle = $value }
+                else {  }
+            }
+        }
+        else {
+            goingout( "$STRING_MSG_RCC $rcfilepath: $_.\n" , 40 , 0 );  # bad construct
+        }
     }
     close IN ;
+print "\ncanbemode: $canbemode\n\n" ; # DEBUG
+print "seltag  : >$seltag<\n" ; # DEBUG
+print "on      : >$on<\n" ; # DEBUG
+print "off     : >$off<\n" ; # DEBUG
+print "filter  : >$filter<\n" ; # DEBUG
+print "upper   : >$upper<\n" ; # DEBUG
+print "lower   : >$lower<\n" ; # DEBUG
+print "L10N    : >$L10N<\n" ; # DEBUG
+print "viewinfo: >$viewinfo<\n" ; # DEBUG
+print "showtime: >$showtime<\n" ; # DEBUG
+print "prompt  : >$prompt<\n" ; # DEBUG
+print "lblstyle: >$lblstyle<\n" ; # DEBUG
+print "sepstyle: >$sepstyle<\n\n" ; # DEBUG
+
+#exit 0 ; # DEBUG
 }
 
 # ------------------------------------------------------------------ Term::Readline object

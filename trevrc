@@ -3,7 +3,7 @@ review.default.L10N       = eng-USA
 review.default.viewinfo   = on
 review.default.showtime   = on
 review.default.filter     = 
-review.default.seltag     = 
+review.default.seltag     = active
 review.default.on         = start
 review.default.off        = stop
 # quotes to remark blank :
@@ -21,8 +21,8 @@ review.weekly.filter=due.before:tomorrow
 review.weekly.seltag= +w
 review.weekly.on= mod +w
 review.weekly.off=mod -w
-review.weekly.prompt='trev> '
-review.weekly.lblstyle=reverse bold
+review.weekly.prompt='Weekly> '
+review.weekly.lblstyle=arabic fade bold   
 review.weekly.sepstyle=underline bold
 review.weekly.viewinfo=off
 review.weekly.upper= 
@@ -57,7 +57,7 @@ review.active.on     = start
 review.active.off    = stop
 review.active.upper  = These tasks are active
 review.active.lower  = Use "+" to start, and "-" to stop a task
-review.active.filter = active
+review.active.filter = 
 
 # ------------------------------------------------- next actions review
 review.next.seltag = +next      
