@@ -249,7 +249,7 @@ elsif ( $^O eq 'MSWin32' ) {
 }
 # ------------------------------------------------------------------------------ Main Loop
 my $FLAGNTASKS = 0;                                 # flag: changed number of tasks
-for ( my $i = $start ; $i < $ntasks ; $i++ ) {
+for ( my $i = $start ; $i <= $ntasks ; $i++ ) { # one more, for the final report
     my $line;
     my $curr = $tasks[$i];
 
@@ -263,6 +263,9 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     # ------------------------------------------------------------------- Progress bar
     my $progbar = $sep;
     my $progind = ( $i + 1 ) . "/" . $ntasks; # . " ";
+    if (  $i == $ntasks ) {                 # past the last, final report
+        $progind = ( $i ) . "/" . $ntasks ; # no advance, show the last
+    }
 
     my $barmaxl = $cols - 8;
     my $percent = ( $i ) / $ntasks;
@@ -288,8 +291,13 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     $lowtxt = $lowtxt." ($progind): $loaddtext";
     substr( $lowlbl, 1, length($lowtxt) ) = $lowtxt;
     print colored ( $lowlbl, $lblstyle ), "\n";              # lower label
-    system("task $curr rc.verbose:off");                     # the task to review
-    print colored ( $sep, $sepstyle ), "\n";                 # separating line
+    if (  $i == $ntasks ) {                       # past the last: final report done, exit
+        goingout( "$STRING_MSG_END\n" , 0 , 1 );
+    }
+    else { 
+        system("task $curr rc.verbose:off");                 # the task to review
+        print colored ( $sep, $sepstyle ), "\n";             # separating line
+    }
 
     # ------------------------------------------------------------ Getting user input
     if( $FLAGNTASKS == 0 ) {
