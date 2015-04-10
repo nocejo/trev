@@ -257,7 +257,10 @@ $STRING_MSG_HLP = "Commands:   +                  Marca la tarea\n" .
 }
 
 # ------------------------------------------------------------------ Term::Readline object
-my $intime = time();                                                  # Record time
+my $intime = 0 ;
+if( $showtime eq "on" ) {
+    $intime = time();                                     # Record time
+}
 
 my $term = Term::ReadLine->new('');
 $term->ornaments(0);    # disable prompt default styling (underline)
