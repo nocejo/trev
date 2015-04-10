@@ -297,6 +297,16 @@ if ( $^O eq 'cygwin' ) {
 elsif ( $^O eq 'MSWin32' ) {
     $clearcommand = 'cls' ;
 }
+
+# ------------------------------------------------ viewinfo switch
+my $postcommand = "" ;
+if( $viewinfo eq "on" ) {
+    $postcommand = " rc.verbose:off";
+}
+else {
+    $postcommand = " rc.verbose:off list";
+}
+
 # ------------------------------------------------------------------------------ Main Loop
 my $FLAGNTASKS = 0;                                 # flag: changed number of tasks
 for ( my $i = $start ; $i < $ntasks ; $i++ ) {
@@ -338,7 +348,10 @@ for ( my $i = $start ; $i < $ntasks ; $i++ ) {
     $lowtxt = $lowtxt." ($progind): $lower";
     substr( $lowlbl, 1, length($lowtxt) ) = $lowtxt;
     print colored ( $lowlbl, $lblstyle ), "\n";              # lower label
-    system("task $curr rc.verbose:off");                     # the task to review
+    
+    # ------------------------------------------------------------- the task to review
+    system("task $curr $postcommand");
+
     print colored ( $sep, $sepstyle ), "\n";                 # separating line
 
     # ------------------------------------------------------------ Getting user input
