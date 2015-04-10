@@ -87,6 +87,7 @@ my $STRING_MSG_QIT = "Terminated (task ";
 my $STRING_MSG_RCN = "rc file not found, going with hard wired defaults.";
 my $STRING_MSG_RCO = "Error opening rc file:";
 my $STRING_MSG_RCC = "Erroneous construction in:";
+my $STRING_MSG_RCP = "Unknown parameter in";
 my $STRING_MSG_RET = "Press [RET] to continue: ";
 my $STRING_MSG_STA = ": doesn't appear as visible.";
 my $STRING_MSG_UND = "Not understood.";
@@ -181,10 +182,8 @@ else { # ------------------------------------------------------- Reading rc
     while( <IN> ) {
         chomp ;
         if( m/^\s*$/ || m/^\s*#/ ) { next }  # blank lines and comments out
-#        print( $_ , "\n" ) ; # DEBUG
         if( m/^\s*review.(\w+).(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line constuct
             if( $1 eq $canbemode ) {
-#                print( "|$1|$2|$3|\n" ) ;
                 my $param = $2 ;
                 my $value = $3 ;
                 $value =~ s/\s*$// ;
@@ -202,7 +201,9 @@ else { # ------------------------------------------------------- Reading rc
                 elsif( $param eq "prompt"   ) { $prompt   = $value }
                 elsif( $param eq "lblstyle" ) { $lblstyle = $value }
                 elsif( $param eq "sepstyle" ) { $sepstyle = $value }
-                else {  }
+                else {
+                    goingout( "$STRING_MSG_RCP $rcfilepath : $param\n" , 35 , 0 ) ;
+                }
             }
         }
         else {
@@ -239,6 +240,7 @@ $STRING_MSG_QIT = "Terminado (tarea ";
 $STRING_MSG_RCN = "fichero rc no encontrado, usando valores por defecto de script.";
 $STRING_MSG_RCO = "Error abriendo el fichero rc:";
 $STRING_MSG_RCC = "Construcción errónea en:";
+$STRING_MSG_RCP = "Parámetro desconocido en";
 $STRING_MSG_RET = "Presione [RET] para continuar. ";
 $STRING_MSG_STA = ": no aparece como visible.";
 $STRING_MSG_TIM = "Corriendo durante ";
