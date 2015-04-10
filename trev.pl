@@ -168,60 +168,78 @@ foreach my $path ( @rcpaths ) {
 if( $rcfilepath eq "" ) {
     print( "\nWarning: $STRING_MSG_RCN\n\n" ) ;
 }
-else { # ------------------------------------------------------- Reading rc
+else {
+    # ------------------------------------------------------- Reading rc
     open( IN , $rcfilepath ) ||
         goingout( "$STRING_MSG_RCO $rcfilepath\n" , 30 , "off" ) ;
+    my @inlines = <IN> ;
+    close IN ;
+
+    # ------------------------------------------------------- Parsing rc
+    # this way 'default' mode is always parsed (and parsed first) :
+    my @modes     = ( "default" ) ;
+    my $mode      = "" ;
     my $canbemode = "" ;
-    if( $filter eq "" ) {
-        $canbemode = "default" ;
-    }
-    elsif( $filter =~ m/(^\w+$)/ ) {         # just one word
+    if( $filter =~ m/(^\w+$)/ ) {         # single word
         $canbemode = $1 ;
     }
-    
-    while( <IN> ) {
-        chomp ;
-        if( m/^\s*$/ || m/^\s*#/ ) { next }  # blank lines and comments out
-        if( m/^\s*review.(\w+).(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line constuct
-            if( $1 eq $canbemode ) {
-                my $param = $2 ;
-                my $value = $3 ;
-                $value =~ s/\s*$// ;
-                $value =~ s/^[\'|\"]// ; 
-                $value =~ s/[\'|\"]$// ; 
-                if(    $param eq "seltag"   ) { $seltag   = $value }
-                elsif( $param eq "on"       ) { $on       = $value }
-                elsif( $param eq "off"      ) { $off      = $value }
-                elsif( $param eq "filter"   ) { $filter   = $value }
-                elsif( $param eq "upper"    ) { $upper    = $value }
-                elsif( $param eq "lower"    ) { $lower    = $value }
-                elsif( $param eq "L10N"     ) { $L10N     = $value }
-                elsif( $param eq "viewinfo" ) { $viewinfo = $value }
-                elsif( $param eq "showtime" ) { $showtime = $value }
-                elsif( $param eq "prompt"   ) { $prompt   = $value }
-                elsif( $param eq "lblstyle" ) { $lblstyle = $value }
-                elsif( $param eq "sepstyle" ) { $sepstyle = $value }
-                else {
-                    goingout( "$STRING_MSG_RCP $rcfilepath : $param\n" , 35 , 0 ) ;
-                }
+    # checking syntax and identifying requested modes:
+    my @rclines = () ;
+    foreach my $rcline ( @inlines ) {
+        chomp( $rcline ) ;
+        if( $rcline =~ m/^\s*$/ || $rcline =~ m/^\s*#/ ) { next } # blank lines & comments
+        if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line
+            push( @rclines , $rcline ) ;
+            if( $mode eq "" && $1 eq $canbemode ) {
+                $mode = $canbemode ;
+                push( @modes , $canbemode ) ;
             }
         }
         else {
-            goingout( "$STRING_MSG_RCC $rcfilepath: $_.\n" , 40 , 0 );  # bad construct
+            goingout( "$STRING_MSG_RCC $rcfilepath: $rcline.\n" , 40 , 0 );# bad construct
+        }
+    }
+    # reading parameters, first 'default' and then requested mode, if existing: 
+    foreach my $mode ( @modes ) {
+        foreach my $rcline ( @rclines ) {
+            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) {
+                if( $1 eq $mode ) {
+                    my $param = $2 ;
+                    my $value = $3 ;
+                    $value =~ s/\s*$// ;
+                    $value =~ s/^[\'|\"]// ; 
+                    $value =~ s/[\'|\"]$// ; 
+                    if(    $param eq "seltag"   ) { $seltag   = $value }
+                    elsif( $param eq "on"       ) { $on       = $value }
+                    elsif( $param eq "off"      ) { $off      = $value }
+                    elsif( $param eq "filter"   ) { $filter   = $value }
+                    elsif( $param eq "upper"    ) { $upper    = $value }
+                    elsif( $param eq "lower"    ) { $lower    = $value }
+                    elsif( $param eq "L10N"     ) { $L10N     = $value }
+                    elsif( $param eq "viewinfo" ) { $viewinfo = $value }
+                    elsif( $param eq "showtime" ) { $showtime = $value }
+                    elsif( $param eq "prompt"   ) { $prompt   = $value }
+                    elsif( $param eq "lblstyle" ) { $lblstyle = $value }
+                    elsif( $param eq "sepstyle" ) { $sepstyle = $value }
+                    else {
+                        goingout( "$STRING_MSG_RCP $rcfilepath : $param\n" , 35 , 0 ) ;
+                    }
+                }
+            }
         }
     }
     close IN ;
 print "\ncanbemode: $canbemode\n\n" ; # DEBUG
-print "seltag  : >$seltag<\n" ; # DEBUG
-print "on      : >$on<\n" ; # DEBUG
-print "off     : >$off<\n" ; # DEBUG
-print "filter  : >$filter<\n" ; # DEBUG
-print "upper   : >$upper<\n" ; # DEBUG
-print "lower   : >$lower<\n" ; # DEBUG
 print "L10N    : >$L10N<\n" ; # DEBUG
 print "viewinfo: >$viewinfo<\n" ; # DEBUG
 print "showtime: >$showtime<\n" ; # DEBUG
+print "filter  : >$filter<\n" ; # DEBUG
+print "seltag  : >$seltag<\n" ; # DEBUG
+print "on      : >$on<\n" ; # DEBUG
+print "off     : >$off<\n" ; # DEBUG
 print "prompt  : >$prompt<\n" ; # DEBUG
+print "upper   : >$upper<\n" ; # DEBUG
+print "lower   : >$lower<\n" ; # DEBUG
 print "lblstyle: >$lblstyle<\n" ; # DEBUG
 print "sepstyle: >$sepstyle<\n\n" ; # DEBUG
 
