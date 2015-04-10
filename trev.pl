@@ -76,7 +76,7 @@ my @allowch = ( 'add', 'delete', 'done', 'modify', 'duplicate','undo' );
 my @nonumb = ( 'add', 'log', 'version', 'calendar' ,'undo' );
 
 # ----------------------------------------------------------------------------------- L10N
-#if( $L10N eq "eng-USA" ) {         # -------------------------------- eng-USA (default)
+                      # -------------------------------- eng-USA (default)
 my $STRING_LBL_SEL = "Selected";
 my $STRING_MSG_AMB = "is ambiguous, can be:";
 my $STRING_MSG_END = "Finished.";
@@ -102,34 +102,6 @@ my $STRING_MSG_HLP = "Commands:   +                  Mark task\n" .
                      "            ?, h[elp]          Display this help\n" .
                      "            q[uit], exit, bye  Exit\n\n" .
                      "Press [RET] to continue.\n";
-#}
-if( $L10N eq "esp-ESP" ) {         # -------------------------------- esp-ESP
-$STRING_LBL_SEL = "Seleccionadas";
-$STRING_MSG_AMB = "es ambiguo, puede ser:";
-$STRING_MSG_END = "Finalizado.";
-$STRING_MSG_ERR = "Aviso: no se completa";
-$STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
-$STRING_MSG_NON = "\nNinguna\n\n";
-$STRING_MSG_QIT = "Terminado (tarea ";
-$STRING_MSG_RCN = "fichero rc no encontrado, usando valores por defecto de script.";
-$STRING_MSG_RCO = "Error abriendo el fichero rc:";
-$STRING_MSG_RCC = "Construcción errónea en:";
-$STRING_MSG_RET = "Presione [RET] para continuar. ";
-$STRING_MSG_STA = ": no aparece como visible.";
-$STRING_MSG_TIM = "Corriendo durante ";
-$STRING_MSG_UND = "No comprendido.";
-$STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
-$STRING_NOW_TXT = "Revisando";
-$STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
-$STRING_MSG_HLP = "Commands:   +                  Marca la tarea\n" .
-                  "            -                  Desmarca la tarea\n" .
-                  "            -id                Desmarca la tarea [id]\n" .
-                  "            [RET]              Continúa a la tarea siguiente\n" .
-                  "            b                  Vuelve a la tarea previa\n" .
-                  "            ?, h[elp]          Muestra esta ayuda\n" .
-                  "            q[uit], exit, bye  Finaliza\n\n" .
-                  "Presione [RET] para continuar.\n";
-}
 
 # -------------------------------------------------------------- Taskwarrior Version check
 my ( $major, $minor ) = split( /\./, `task --version` );
@@ -253,6 +225,35 @@ print "lblstyle: >$lblstyle<\n" ; # DEBUG
 print "sepstyle: >$sepstyle<\n\n" ; # DEBUG
 
 #exit 0 ; # DEBUG
+}
+
+# ----------------------------------------------------------- L10N (non-default languages)
+if( $L10N eq "esp-ESP" ) { # -------------------------------- esp-ESP
+$STRING_LBL_SEL = "Seleccionadas";
+$STRING_MSG_AMB = "es ambiguo, puede ser:";
+$STRING_MSG_END = "Finalizado.";
+$STRING_MSG_ERR = "Aviso: no se completa";
+$STRING_MSG_NFD = "Tareas actual y siguiente no encontradas.";
+$STRING_MSG_NON = "\nNinguna\n\n";
+$STRING_MSG_QIT = "Terminado (tarea ";
+$STRING_MSG_RCN = "fichero rc no encontrado, usando valores por defecto de script.";
+$STRING_MSG_RCO = "Error abriendo el fichero rc:";
+$STRING_MSG_RCC = "Construcción errónea en:";
+$STRING_MSG_RET = "Presione [RET] para continuar. ";
+$STRING_MSG_STA = ": no aparece como visible.";
+$STRING_MSG_TIM = "Corriendo durante ";
+$STRING_MSG_UND = "No comprendido.";
+$STRING_MSG_VER = "Taskwarrior debe estar al menos en su versión 2.2.0 .";
+$STRING_NOW_TXT = "Revisando";
+$STRING_WRN_NUM = "¡Número de tareas cambiado! > ";
+$STRING_MSG_HLP = "Commands:   +                  Marca la tarea\n" .
+                  "            -                  Desmarca la tarea\n" .
+                  "            -id                Desmarca la tarea [id]\n" .
+                  "            [RET]              Continúa a la tarea siguiente\n" .
+                  "            b                  Vuelve a la tarea previa\n" .
+                  "            ?, h[elp]          Muestra esta ayuda\n" .
+                  "            q[uit], exit, bye  Finaliza\n\n" .
+                  "Presione [RET] para continuar.\n";
 }
 
 # ------------------------------------------------------------------ Term::Readline object
