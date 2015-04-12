@@ -1,6 +1,10 @@
 # trev.pod
 # Follows http://perldoc.perl.org/perlpodstyle.html
 
+=head1 WARNING
+
+2015-04-12 Documentation needs updating to include recent changes, in particular new rc file.
+
 =head1 NAME
 
 trev.pl - taskwarrior tasks reviewing script
@@ -209,7 +213,7 @@ http://www.opensource.org/licenses/mit-license.php
 
 =head1 DATE
 
-8-Mar-2015
+12-Apr-2015
 
 =cut
 

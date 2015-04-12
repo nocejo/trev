@@ -1,0 +1,78 @@
+# ------------------------------------------------- default review
+review.default.L10N       = eng-USA
+review.default.viewinfo   = on
+review.default.showtime   = on
+review.default.filter     = 
+review.default.seltag     = active
+review.default.on         = start
+review.default.off        = stop
+# quotes to remark blank :
+review.default.prompt     = 'trev> '
+review.default.upper      = 
+review.default.lower      = 
+review.default.lblstyle   = reverse bold
+review.default.sepstyle   = underline bold
+
+# ------------------------------------------------- weekly review
+review.weekly.L10N=esp-ESP
+review.weekly.viewinfo=off
+review.weekly.showtime=off
+review.weekly.filter=due.before:tomorrow
+review.weekly.seltag= +w
+review.weekly.on= mod +w
+review.weekly.off=mod -w
+review.weekly.prompt='Weekly> '
+review.weekly.lblstyle=arabic fade bold   
+review.weekly.sepstyle=underline bold
+review.weekly.viewinfo=off
+review.weekly.upper= 
+review.weekly.lower= 
+
+# ------------------------------------------------- tasks due "someday" review
+review.someday.seltag = +someday     
+review.someday.on     = mod +someday 
+review.someday.off    = mod -someday 
+review.someday.upper  = These tasks are marked as "someday" (due 1/18/2038)
+review.someday.lower  = Use "+" to add, and "-" to remove +someday tag
+review.someday.filter = +someday
+
+# ------------------------------------------------- calls review
+review.calls.filter      = urgency.over:12 +READY
+review.calls.seltag      = +call
+review.calls.on          = mod +call
+review.calls.off         = mod -call
+# quotes to remark blank :
+review.calls.prompt      = 'trev calls> '
+review.calls.lblstyle    = reverse bold
+review.calls.sepstyle    = underline bold
+review.calls.upper       = Make these phone calls!
+review.calls.lower       = These are high-urgency actionable tasks!
+
+# ------------------------------------------------- active tasks review
+# selection tag (fake, active is a report, not a tag):
+review.active.seltag = active
+# select action :
+review.active.on     = start
+# unselect action :
+review.active.off    = stop
+review.active.upper  = These tasks are active
+review.active.lower  = Use "+" to start, and "-" to stop a task
+review.active.filter = 
+
+# ------------------------------------------------- next actions review
+review.next.seltag = +next      
+review.next.on     = mod +next  
+review.next.off    = mod -next  
+review.next.upper  = These tasks are marked as Next Actions 
+review.next.lower  = Use "+" to add, and "-" to remove +next tag
+review.next.filter = +next
+
+# ------------------------------------------------- overdue tasks review
+review.overdue.seltag = +OVERDUE -DUE       
+review.overdue.on     = start
+review.overdue.off    = stop
+review.overdue.upper  = These tasks are overdue
+review.overdue.lower  = Use "+" to start, and "-" to stop a task
+review.overdue.filter = +OVERDUE -DUE
+ 
+
