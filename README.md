@@ -1,3 +1,7 @@
+# WARNING
+
+2015-04-12 Documentation needs updating to include recent changes, in particular new rc file.
+
 # NAME
 
 trev.pl - taskwarrior tasks reviewing script
@@ -194,4 +198,4 @@ http://www.opensource.org/licenses/mit-license.php
 
 # DATE
 
-8-Mar-2015
+12-Apr-2015
