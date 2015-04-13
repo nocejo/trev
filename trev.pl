@@ -40,7 +40,7 @@ use Term::ReadLine::Gnu;       # Perl extension for the GNU Readline/History Lib
 #use Term::ReadKey;        # MSWindows?
 use File::Basename;
 my $scriptdir = dirname(__FILE__);   # locating the script dir
-
+my $next_step = "" ;                 # next mode in a multistep review
 #  Configuration > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > >
 # -------------------------------------------------- Parameter hard-wired defaults
 my $seltag    = "active";            # selection tag (fake, active is a report, not a tag)
@@ -188,8 +188,19 @@ else {
     foreach my $rcline ( @inlines ) {
         chomp( $rcline ) ;
         if( $rcline =~ m/^\s*$/ || $rcline =~ m/^\s*#/ ) { next } # blank lines & comments
+
+        # ------------------------------------------------------------ multistep
+        if( $rcline =~ m/^\s*review\.(\w+)\-?(\w+)*\.\w+\s*\=\s*.*$/ ) { # legal trevrc line
+            if( defined( $2 ) ) {
+                $next_step = "$1-$2" ;
+                print( ">>>>>>>>>>>>>>>>> multi ($1>$2)\n" ) ;
+            }
+        }
+
+
+
 #        if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line
-        if( $rcline =~ m/^\s*review\.(\w+)\.\w+\s*\=\s*.*$/ ) { # legal trevrc line
+        if( $rcline =~ m/^\s*review\.(\w+)\-?(\w+)*\.\w+\s*\=\s*.*$/ ) { # legal trevrc line
             push( @rclines , $rcline ) ;
             if( $mode eq "" && $1 eq $canbemode ) {
                 $mode = $canbemode ;
@@ -203,35 +214,35 @@ else {
     # reading parameters, first 'default' and then requested mode, if existing: 
     foreach my $mode ( @modes ) {
         foreach my $rcline ( @rclines ) {
-#            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) {
-            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)\s*\=\s*(.*)$/ ) {
-                if( $1 eq $mode ) {
-                    my $param = $2 ;
-                    my $value = $3 ;
-                    $value =~ s/\s*$// ;
-                    $value =~ s/^[\'|\"]// ; 
-                    $value =~ s/[\'|\"]$// ; 
-                    if(    $param eq "seltag"   ) { $seltag   = $value }
-                    elsif( $param eq "on"       ) { $on       = $value }
-                    elsif( $param eq "off"      ) { $off      = $value }
-                    elsif( $param eq "filter"   ) { $filter   = $value }
-                    elsif( $param eq "upper"    ) { $upper    = $value }
-                    elsif( $param eq "lower"    ) { $lower    = $value }
-                    elsif( $param eq "L10N"     ) { $L10N     = $value }
-                    elsif( $param eq "viewinfo" ) { $viewinfo = $value }
-                    elsif( $param eq "showtime" ) { $showtime = $value }
-                    elsif( $param eq "prompt"   ) { $prompt   = $value }
-                    elsif( $param eq "lblstyle" ) { $lblstyle = $value }
-                    elsif( $param eq "sepstyle" ) { $sepstyle = $value }
-                    else {
-                        goingout( "$STRING_MSG_RCP $rcfilepath : $param\n" , 35 , 0 ) ;
-                    }
+#            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)\s*\=\s*(.*)$/ ) {
+            $rcline =~ m/^\s*review\.(\w+)\-?(\w+)*\.(\w+)\s*\=\s*(.*)$/ ;
+            my $param = $3 ;
+            my $value = $4 ;
+            if( $1 eq $mode ) {
+                $value =~ s/\s*$// ;
+                $value =~ s/^[\'|\"]// ; 
+                $value =~ s/[\'|\"]$// ; 
+                if(    $param eq "seltag"   ) { $seltag   = $value }
+                elsif( $param eq "on"       ) { $on       = $value }
+                elsif( $param eq "off"      ) { $off      = $value }
+                elsif( $param eq "filter"   ) { $filter   = $value }
+                elsif( $param eq "upper"    ) { $upper    = $value }
+                elsif( $param eq "lower"    ) { $lower    = $value }
+                elsif( $param eq "L10N"     ) { $L10N     = $value }
+                elsif( $param eq "viewinfo" ) { $viewinfo = $value }
+                elsif( $param eq "showtime" ) { $showtime = $value }
+                elsif( $param eq "prompt"   ) { $prompt   = $value }
+                elsif( $param eq "lblstyle" ) { $lblstyle = $value }
+                elsif( $param eq "sepstyle" ) { $sepstyle = $value }
+                else {
+                    goingout( "$STRING_MSG_RCP $rcfilepath : $param\n" , 35 , 0 ) ;
                 }
             }
         }
     }
-    close IN ;
-print "\ncanbemode: $canbemode\n\n" ; # DEBUG
+#    close IN ;
+print "\ncanbemode: $canbemode\n" ; # DEBUG
+print "     mode: $mode\n\n" ; # DEBUG
 print "L10N    : >$L10N<\n" ; # DEBUG
 print "viewinfo: >$viewinfo<\n" ; # DEBUG
 print "showtime: >$showtime<\n" ; # DEBUG
@@ -582,6 +593,11 @@ sub goingout {
         my $d = $_;                $d = ($d == 0) ? "" : $d."d " ;
         print ( $STRING_MSG_TIM.$d.$h.$m.$s."s\n" );
     }
+    
+    if( $next_step ne "" ) {
+        print( "\nMultistep review; next: $next_step\nDo you want to proceed?\n\n" ) ;
+    }
+    
     exit( $retval );
 }
 __END__
