@@ -188,7 +188,8 @@ else {
     foreach my $rcline ( @inlines ) {
         chomp( $rcline ) ;
         if( $rcline =~ m/^\s*$/ || $rcline =~ m/^\s*#/ ) { next } # blank lines & comments
-        if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line
+#        if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line
+        if( $rcline =~ m/^\s*review\.(\w+)\.\w+\s*\=\s*.*$/ ) { # legal trevrc line
             push( @rclines , $rcline ) ;
             if( $mode eq "" && $1 eq $canbemode ) {
                 $mode = $canbemode ;
@@ -202,7 +203,8 @@ else {
     # reading parameters, first 'default' and then requested mode, if existing: 
     foreach my $mode ( @modes ) {
         foreach my $rcline ( @rclines ) {
-            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) {
+#            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) {
+            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)\s*\=\s*(.*)$/ ) {
                 if( $1 eq $mode ) {
                     my $param = $2 ;
                     my $value = $3 ;
