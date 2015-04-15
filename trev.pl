@@ -40,7 +40,7 @@ use Term::ReadLine::Gnu;       # Perl extension for the GNU Readline/History Lib
 #use Term::ReadKey;        # MSWindows?
 use File::Basename;
 my $scriptdir = dirname(__FILE__);   # locating the script dir
-my $next_step = "" ;                 # next mode in a multistep review
+
 #  Configuration > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > >
 # -------------------------------------------------- Parameter hard-wired defaults
 my $seltag    = "active";            # selection tag (fake, active is a report, not a tag)
@@ -155,6 +155,10 @@ if ( scalar(@ARGV) != 0 ) {
 }
 
 # -------------------------------------------------------------------------------- rc file
+#my $multi_root ;                 # general mode in a multi-step review; not defined
+my $multi_curr = "" ;                 # current mode in a multi-step review; not defined
+#my $multi_next ;                 # next    mode in a multi-step review; not defined
+
 # -------------------------------------------------- locating the rc file (or none)
 my $rcfilepath = "" ;
 my $userhome = $ENV{"HOME"} ;
@@ -176,73 +180,77 @@ else {
     close IN ;
 
     # ------------------------------------------------------- Parsing rc
-    # this way 'default' mode is always parsed (and parsed first) :
-    my @modes     = ( "default" ) ;
-    my $mode      = "" ;
     my $canbemode = "" ;
-    if( $filter =~ m/(^\w+$)/ ) {         # single word
-        $canbemode = $1 ;
+    if( $filter =~ m/^\w+$/ ) {               # single word
+        $canbemode = $filter ;
+        $multi_curr = "" ;
     }
-    # checking syntax and identifying requested modes:
-    my @rclines = () ;
+    elsif( $filter =~ m/(\w+)\*?(\w*)/ ) {   # word*word , step in a multi-step
+        $canbemode  = $1 ;
+        $multi_curr = $filter ;
+    }
+
+    # ---------------------- checking syntax and identifying requested modes:
+    my @configpar = () ;     # relevant configuration parameters in rc file
+    my @configval = () ;     # values
+    my @temppar   = () ;     # temporal storage for parameters in rc file
+    my @tempval   = () ;     # values
+    my @rclines   = () ;
     foreach my $rcline ( @inlines ) {
         chomp( $rcline ) ;
         if( $rcline =~ m/^\s*$/ || $rcline =~ m/^\s*#/ ) { next } # blank lines & comments
 
-        # ------------------------------------------------------------ multistep
-        if( $rcline =~ m/^\s*review\.(\w+)\-?(\w+)*\.\w+\s*\=\s*.*$/ ) { # legal trevrc line
-            if( defined( $2 ) ) {
-                $next_step = "$1-$2" ;
-                print( ">>>>>>>>>>>>>>>>> multi ($1>$2)\n" ) ;
+        if( $rcline =~ m/^\s*review\.(\w+)(\*?)(\w*)\.(\w+)\s*\=\s*(.*)$/ ) { # legal line
+            if( $2 eq "" ) {  # default (no mode) and single step modes
+                if( $1 eq "default" ) {
+                    push( @configpar , $4 ) ;
+                    push( @configval , $5 ) ;
+                }
+                elsif( $1 eq $canbemode ) {
+                    push( @temppar , $4 ) ;
+                    push( @tempval , $5 ) ;
+                }
             }
-        }
-
-
-
-#        if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)*\s*\=\s*(.*)$/ ) { # legal trevrc line
-        if( $rcline =~ m/^\s*review\.(\w+)\-?(\w+)*\.\w+\s*\=\s*.*$/ ) { # legal trevrc line
-            push( @rclines , $rcline ) ;
-            if( $mode eq "" && $1 eq $canbemode ) {
-                $mode = $canbemode ;
-                push( @modes , $canbemode ) ;
+            else {  # multi-step modes
+                if( $3 ne "" && $1.$2.$3 eq $multi_curr ) {  # individual step config
+                    push( @temppar , $4 ) ;
+                    push( @tempval , $5 ) ;
+                }
+                elsif ( $3 eq "" && $1 eq $canbemode ) {     # common multi-step config
+                    unshift( @temppar , $4 ) ;  # common config prior to individual
+                    unshift( @tempval , $5 ) ;
+                }
             }
         }
         else {
             goingout( "$STRING_MSG_RCC $rcfilepath: $rcline.\n" , 40 , 0 );# bad construct
         }
     }
-    # reading parameters, first 'default' and then requested mode, if existing: 
-    foreach my $mode ( @modes ) {
-        foreach my $rcline ( @rclines ) {
-#            if( $rcline =~ m/^\s*review\.(\w+)\.(\w+)\s*\=\s*(.*)$/ ) {
-            $rcline =~ m/^\s*review\.(\w+)\-?(\w+)*\.(\w+)\s*\=\s*(.*)$/ ;
-            my $param = $3 ;
-            my $value = $4 ;
-            if( $1 eq $mode ) {
-                $value =~ s/\s*$// ;
-                $value =~ s/^[\'|\"]// ; 
-                $value =~ s/[\'|\"]$// ; 
-                if(    $param eq "seltag"   ) { $seltag   = $value }
-                elsif( $param eq "on"       ) { $on       = $value }
-                elsif( $param eq "off"      ) { $off      = $value }
-                elsif( $param eq "filter"   ) { $filter   = $value }
-                elsif( $param eq "upper"    ) { $upper    = $value }
-                elsif( $param eq "lower"    ) { $lower    = $value }
-                elsif( $param eq "L10N"     ) { $L10N     = $value }
-                elsif( $param eq "viewinfo" ) { $viewinfo = $value }
-                elsif( $param eq "showtime" ) { $showtime = $value }
-                elsif( $param eq "prompt"   ) { $prompt   = $value }
-                elsif( $param eq "lblstyle" ) { $lblstyle = $value }
-                elsif( $param eq "sepstyle" ) { $sepstyle = $value }
-                else {
-                    goingout( "$STRING_MSG_RCP $rcfilepath : $param\n" , 35 , 0 ) ;
-                }
+    push( @configpar , @temppar ) ;
+    push( @configval , @tempval ) ;
+
+    while( my $param = shift( @configpar ) ) {
+            my $value = shift( @configval ) ;
+            $value =~ s/\s*$// ;
+            $value =~ s/^[\'|\"]// ; 
+            $value =~ s/[\'|\"]$// ; 
+            if(    $param eq "seltag"   ) { $seltag   = $value }
+            elsif( $param eq "on"       ) { $on       = $value }
+            elsif( $param eq "off"      ) { $off      = $value }
+            elsif( $param eq "filter"   ) { $filter   = $value }
+            elsif( $param eq "upper"    ) { $upper    = $value }
+            elsif( $param eq "lower"    ) { $lower    = $value }
+            elsif( $param eq "L10N"     ) { $L10N     = $value }
+            elsif( $param eq "viewinfo" ) { $viewinfo = $value }
+            elsif( $param eq "showtime" ) { $showtime = $value }
+            elsif( $param eq "prompt"   ) { $prompt   = $value }
+            elsif( $param eq "lblstyle" ) { $lblstyle = $value }
+            elsif( $param eq "sepstyle" ) { $sepstyle = $value }
+            else {
+                goingout( "$STRING_MSG_RCP $rcfilepath : $param\n" , 35 , 0 ) ;
             }
-        }
     }
-#    close IN ;
-print "\ncanbemode: $canbemode\n" ; # DEBUG
-print "     mode: $mode\n\n" ; # DEBUG
+
 print "L10N    : >$L10N<\n" ; # DEBUG
 print "viewinfo: >$viewinfo<\n" ; # DEBUG
 print "showtime: >$showtime<\n" ; # DEBUG
@@ -255,7 +263,6 @@ print "upper   : >$upper<\n" ; # DEBUG
 print "lower   : >$lower<\n" ; # DEBUG
 print "lblstyle: >$lblstyle<\n" ; # DEBUG
 print "sepstyle: >$sepstyle<\n\n" ; # DEBUG
-
 #exit 0 ; # DEBUG
 }
 
@@ -594,9 +601,9 @@ sub goingout {
         print ( $STRING_MSG_TIM.$d.$h.$m.$s."s\n" );
     }
     
-    if( $next_step ne "" ) {
-        print( "\nMultistep review; next: $next_step\nDo you want to proceed?\n\n" ) ;
-    }
+#    if( $multi_curr ne "" ) {
+#        print( "\nMultistep review; next: $multi_curr\nDo you want to proceed?\n\n" ) ;
+#    }
     
     exit( $retval );
 }
