@@ -196,10 +196,16 @@ else {
     my @temppar   = () ;     # temporal storage for parameters in rc file
     my @tempval   = () ;     # values
     my @rclines   = () ;
-    foreach my $rcline ( @inlines ) {
+    foreach my $rcline ( @inlines ) {  # filtering rc
         chomp( $rcline ) ;
-        if( $rcline =~ m/^\s*$/ || $rcline =~ m/^\s*#/ ) { next } # blank lines & comments
-
+        if( $rcline =~ m/^\s*$/ || $rcline =~ m/^\s*#/ ) { # blank lines & comments
+            next ;
+        }
+        $rcline =~ s/\s*#.*$// ;  # comments at the end of line
+        print( "$rcline\n" ) ;
+        push( @rclines , $rcline ) ;
+    }
+    foreach my $rcline ( @rclines ) {
         if( $rcline =~ m/^\s*review\.(\w+)(\*?)(\w*)\.(\w+)\s*\=\s*(.*)$/ ) { # legal line
             if( $2 eq "" ) {  # default (no mode) and single step modes
                 if( $1 eq "default" ) {
