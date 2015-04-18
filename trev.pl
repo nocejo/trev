@@ -2,7 +2,7 @@
 
 # trev.pl - carries out taskwarrior task review.
 #
-# Copyright 2013, Fidel Mato.
+# Copyright 2013-2015, Fidel Mato.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -155,13 +155,16 @@ if ( scalar(@ARGV) != 0 ) {
 }
 
 # -------------------------------------------------------------------------------- rc file
-#my $multi_root ;                 # general mode in a multi-step review; not defined
-my $multi_curr = "" ;                 # current mode in a multi-step review; not defined
-#my $multi_next ;                 # next    mode in a multi-step review; not defined
+my $MODE_TYPE   = 0  ;     # 0, 1, 2, 3 == no, single_or_multi, single, multi
+my $canbemode   = "" ;     # the request
+my $mode_root  = "" ;      # general mode in a multi-step review
+my $curr_step  = "" ;      # current mode in a multi-step review
+my $next_step  = "" ;      # next    mode in a multi-step review
 
 # -------------------------------------------------- locating the rc file (or none)
 my $rcfilepath = "" ;
 my $userhome = $ENV{"HOME"} ;
+
 my @rcpaths  = ( "$userhome/.task/trevrc" , "$userhome/.trevrc" , "$scriptdir/trevrc" ) ;
 foreach my $path ( @rcpaths ) {
     if ( -e $path ) {
@@ -173,65 +176,121 @@ if( $rcfilepath eq "" ) {
     print( "\nWarning: $STRING_MSG_RCN\n\n" ) ;
 }
 else {
-    # ------------------------------------------------------- Reading rc
+    # -------------------------------------------------------------------- Reading rc
     open( IN , $rcfilepath ) ||
         goingout( "$STRING_MSG_RCO $rcfilepath\n" , 30 , "off" ) ;
     my @inlines = <IN> ;
     close IN ;
 
-    # ------------------------------------------------------- Parsing rc
-    my $canbemode = "" ;
-    if( $filter =~ m/^\w+$/ ) {               # single word
+    # -------------------------------------------------------------------- Parsing rc
+    my $FOUND_RQST  = 0  ;     # flag: found requested step
+    my $NEXT_NEXT   = 0  ;     # flag: next step is next review
+    my $NEXT_2ND    = 0  ;     # flag: next step is next to first
+    my $first_step  = "" ;     # name of the first step found in a multistep review
+    my $second_step = "" ;     #             second
+    my @configpar   = () ;     # relevant configuration parameters in rc file
+    my @configval   = () ;     #          values
+    my @temppar     = () ;     # temporal storage for parameters in rc file
+    my @tempval     = () ;     #          values
+    my @multilines  = () ;     # rc lines configuring requested multistep mode
+    my @firstlines  = () ;     # rc lines configuring 1st step found
+
+    if( $filter =~ m/^\w+$/ || $filter =~ m/^\w+\*?\w*$/ ) {  # single word or word*[word]
+        $MODE_TYPE = 1 ;
         $canbemode = $filter ;
-        $multi_curr = "" ;
     }
-    elsif( $filter =~ m/(\w+)\*?(\w*)/ ) {   # word*word , step in a multi-step
-        $canbemode  = $1 ;
-        $multi_curr = $filter ;
+    if( $filter =~ m/^(\w+)\*?\w*$/ ) {  # word*[word]
+        $mode_root = $1 ;
     }
 
     # ---------------------- checking syntax and identifying requested modes:
-    my @configpar = () ;     # relevant configuration parameters in rc file
-    my @configval = () ;     # values
-    my @temppar   = () ;     # temporal storage for parameters in rc file
-    my @tempval   = () ;     # values
-    my @rclines   = () ;
     foreach my $rcline ( @inlines ) {  # filtering rc
         chomp( $rcline ) ;
         if( $rcline =~ m/^\s*$/ || $rcline =~ m/^\s*#/ ) { # blank lines & comments
             next ;
         }
         $rcline =~ s/\s*#.*$// ;  # comments at the end of line
-        print( "$rcline\n" ) ;
-        push( @rclines , $rcline ) ;
-    }
-    foreach my $rcline ( @rclines ) {
+
         if( $rcline =~ m/^\s*review\.(\w+)(\*?)(\w*)\.(\w+)\s*\=\s*(.*)$/ ) { # legal line
-            if( $2 eq "" ) {  # default (no mode) and single step modes
-                if( $1 eq "default" ) {
+            if( $2 eq "" ) {  # 'default' (no mode) and single step modes
+                if( $1 eq "default" ) {       # 'default' must go, and go at the top
                     push( @configpar , $4 ) ;
                     push( @configval , $5 ) ;
                 }
-                elsif( $1 eq $canbemode ) {
+                elsif( ( $MODE_TYPE == 0 ) || ( $MODE_TYPE == 3 )) { # nonmode or multi
+                    next ;
+                }
+                elsif( $1 eq $canbemode ) { # and single, down
+                    $MODE_TYPE = 2 ;  # is a single mode
                     push( @temppar , $4 ) ;
                     push( @tempval , $5 ) ;
                 }
             }
             else {  # multi-step modes
-                if( $3 ne "" && $1.$2.$3 eq $multi_curr ) {  # individual step config
-                    push( @temppar , $4 ) ;
-                    push( @tempval , $5 ) ;
+                if( $MODE_TYPE == 0 || $MODE_TYPE == 2 ) { # request nonmode or single 
+                    next ;
                 }
-                elsif ( $3 eq "" && $1 eq $canbemode ) {     # common multi-step config
-                    unshift( @temppar , $4 ) ;  # common config prior to individual
-                    unshift( @tempval , $5 ) ;
+                
+                if ( ( $3 eq "" ) && ( $1 eq $mode_root ) ) {  # common multi-step config
+                    $MODE_TYPE = 3 ;  # is a multi mode
+                    unshift( @multilines , $rcline ) ;  # common prior to individual
+                    next ;
                 }
-            }
+                # the requested individual step:
+                if( ( $3 ne "" ) && ( $1.$2.$3 eq $canbemode ) ) {
+                    $FOUND_RQST = 1 ;
+                    $NEXT_NEXT  = 1  ;
+                    @firstlines = () ; # not necessary now
+                    $MODE_TYPE  = 3 ;  # is a multi mode
+                    if( $first_step eq "" ) {
+                        $first_step = $canbemode ;
+                    }
+                    $curr_step = $canbemode ;
+                    push( @multilines , $rcline ) ;  # individual, after common
+                    next ;
+                }
+                # another step, not the requested:
+                if( ( $3 ne "" ) && ( $1 eq $mode_root ) && ( $1.$2.$3 ne $canbemode ) ) {
+                    $MODE_TYPE = 3 ;  # is a multi mode
+                    if( $first_step eq "" ) {
+                        $first_step = $1.$2.$3 ;
+                        $NEXT_2ND   = 1 ;
+                        $curr_step  = $1.$2.$3 ;
+                        push( @firstlines , $rcline ) ;
+                        next ;
+                    }
+                    if( $curr_step eq $1.$2.$3 ) {
+                        push( @firstlines , $rcline ) ;
+                        next ;
+                    }
+                    if( ( $NEXT_NEXT == 1 ) && ( $next_step eq "" ) ) {
+                        $next_step = $1.$2.$3 ;
+                        $NEXT_NEXT = 2 ;
+                    }
+                    if( ( $NEXT_2ND == 1 ) && ( $next_step eq "" ) ) {
+                        $second_step = $1.$2.$3 ;
+                        $NEXT_2ND  = 0 ;
+                    }
+                }
+            }        
         }
         else {
             goingout( "$STRING_MSG_RCC $rcfilepath: $rcline.\n" , 40 , 0 );# bad construct
         }
     }
+    if( $FOUND_RQST == 0 ) {
+        push( @multilines , @firstlines ) ;
+    } 
+    if( $NEXT_NEXT == 0 ) {
+        $next_step = $second_step ;
+    }
+
+    foreach my $rcline ( @multilines ) {
+        $rcline =~ m/^\s*review\.(\w+)(\*?)(\w*)\.(\w+)\s*\=\s*(.*)$/ ;
+        push( @temppar , $4 ) ;
+        push( @tempval , $5 ) ;
+    }
+
     push( @configpar , @temppar ) ;
     push( @configval , @tempval ) ;
 
@@ -607,9 +666,19 @@ sub goingout {
         print ( $STRING_MSG_TIM.$d.$h.$m.$s."s\n" );
     }
     
-#    if( $multi_curr ne "" ) {
-#        print( "\nMultistep review; next: $multi_curr\nDo you want to proceed?\n\n" ) ;
-#    }
+    if( $MODE_TYPE == 3 ) {
+        print(  "\n#\n".
+                "# Multi-step review ($canbemode):\n#\n".
+                "#   Finished step : $curr_step" ) ;
+        if( $next_step eq "" ) {
+            print(  " (last)\n#\n\n"   ) ;
+        }
+        else {
+            print(  "\n" .
+                    "#   Next step     : $next_step\n#\n".
+                    "# Proceed [RET] or quit (q)?   [Not implemented]\n#\n\n" ) ;
+        }
+    }
     
     exit( $retval );
 }

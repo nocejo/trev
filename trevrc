@@ -75,4 +75,13 @@ review.overdue.upper  = These tasks are overdue
 review.overdue.lower  = Use "+" to start, and "-" to stop a task
 review.overdue.filter = +OVERDUE -DUE
  
+# --------------------------------------------- wp5 multi
+review.wp5*.filter       = pro:wp5
+review.wp5*.upper        = '                 **IMPORTANT**'
+
+review.wp5*due.filter    = pro:wp5 and due.any:   # with a deadline
+review.wp5*due.lower     = Esto es wp5*due
+
+review.wp5*notdue.filter = pro:wp5 and due.none:
+review.wp5*notdue.lower  = Esto es wp5-notdue
 
