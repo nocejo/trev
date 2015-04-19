@@ -667,16 +667,21 @@ sub goingout {
     }
     
     if( $MODE_TYPE == 3 ) {
-        print(  "\n#\n".
-                "# Multi-step review ($canbemode):\n#\n".
+        print("\n#\n".
+                "# Multi-step review ($mode_root):\n#\n".
                 "#   Finished step : $curr_step" ) ;
         if( $next_step eq "" ) {
             print(  " (last)\n#\n\n"   ) ;
         }
         else {
-            print(  "\n" .
-                    "#   Next step     : $next_step\n#\n".
-                    "# Proceed [RET] or quit (q)?   [Not implemented]\n#\n\n" ) ;
+            print(  "\n#   Next step     : $next_step\n#\n\n" ) ;
+            my $ans = $term->readline( "Proceed [RET] or quit [q+RET])? " ) ;
+            if( $ans eq "" ) {
+                exec( "trev $next_step" ) ;
+            }
+            else {
+                exit( $retval );
+            }
         }
     }
     
