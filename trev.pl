@@ -316,18 +316,18 @@ else {
             }
     }
 
-print "L10N    : >$L10N<\n" ; # DEBUG
-print "viewinfo: >$viewinfo<\n" ; # DEBUG
-print "showtime: >$showtime<\n" ; # DEBUG
-print "filter  : >$filter<\n" ; # DEBUG
-print "seltag  : >$seltag<\n" ; # DEBUG
-print "on      : >$on<\n" ; # DEBUG
-print "off     : >$off<\n" ; # DEBUG
-print "prompt  : >$prompt<\n" ; # DEBUG
-print "upper   : >$upper<\n" ; # DEBUG
-print "lower   : >$lower<\n" ; # DEBUG
-print "lblstyle: >$lblstyle<\n" ; # DEBUG
-print "sepstyle: >$sepstyle<\n\n" ; # DEBUG
+#print "L10N    : >$L10N<\n" ; # DEBUG
+#print "viewinfo: >$viewinfo<\n" ; # DEBUG
+#print "showtime: >$showtime<\n" ; # DEBUG
+#print "filter  : >$filter<\n" ; # DEBUG
+#print "seltag  : >$seltag<\n" ; # DEBUG
+#print "on      : >$on<\n" ; # DEBUG
+#print "off     : >$off<\n" ; # DEBUG
+#print "prompt  : >$prompt<\n" ; # DEBUG
+#print "upper   : >$upper<\n" ; # DEBUG
+#print "lower   : >$lower<\n" ; # DEBUG
+#print "lblstyle: >$lblstyle<\n" ; # DEBUG
+#print "sepstyle: >$sepstyle<\n\n" ; # DEBUG
 #exit 0 ; # DEBUG
 }
 
@@ -675,7 +675,7 @@ sub goingout {
         }
         else {
             print(  "\n#   Next step     : $next_step\n#\n\n" ) ;
-            my $ans = $term->readline( "Proceed [RET] or quit [q+RET])? " ) ;
+            my $ans = $term->readline( "Proceed [RET] or [quit]? > " ) ;
             if( $ans eq "" ) {
                 exec( "trev $next_step" ) ;
             }
