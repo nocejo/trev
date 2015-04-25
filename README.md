@@ -14,11 +14,11 @@ perl trev.pl \[++mark\] \[start+\] \[filter\]
 
 trev is sort of a mini-shell focusing on taskwarrior reviewing.
 
-This script reads a list of pending taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; this action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.
+This script reads a list of pending taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; issued action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.
 
-At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked by taskwarrior as active or with a certain tag chosen by the user.
+At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the tag can be modified by the user as an option at the command line or pre-configured in the dot file.
 
-Tasks list comes from a system call to task, obeying then the user preferred settings for visibility, order, decoration...
+Tasks list comes from a system call to taskwarrior, obeying then the user preferred settings for visibility, order, decoration...
 
 # OPTIONS/ARGUMENTS
 
@@ -28,27 +28,27 @@ No options/arguments are required.  Options to set additional text in upper and/
 
 ## COMMAND LINE OPTIONS
 
-- \-T 'Additional text'
+- `\-T 'Additional text'`
 
-Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
+Adds 'Additional text' to the upper label, as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
 
-- \-t 'Additional text'
+- `\-t 'Additional text'`
 
-Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Quotation marks are required if text contains blank spaces..
+Adds 'Additional text' to the lower label, as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
 
 ## ARGUMENTS
 
 - \[++mark\]
 
-    If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', marking action to 'modify +mark' and unmarking action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
+    If first argument starts with '++', as in `trev.pl ++mark`, the marking tag will be set to '+mark', marking action to `modify +mark` and unmarking action to `modify -mark`.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + `modify`).
 
 - \[start+\]
 
-    A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in 'trev.pl 113'.
+    A numeric argument ending in '+' as in `trev.pl 113+` , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in `trev.pl 113`.
 
 - \[filter\]
 
-    The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
+    The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, dates, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
 
 Argument/option order is mandatory: option(s) must come first, if at all issued. If a marking tag is specified it must be issued as the first argument following options; starting task number can be first (if no marking tag) or second (first is marking tag) after options.  Filter must go at the end of the line.
 
@@ -70,7 +70,7 @@ After displaying a progress bar, marked tasks and the current task, the script p
 
 - \+
 
-    Marks task as 'active' (start-ing it, default) or with the requested marking tag.
+    Marks task as 'active' (start-ing it, default) or with the pre-configured or requested marking tag.
 
 - \-
 
@@ -78,17 +78,15 @@ After displaying a progress bar, marked tasks and the current task, the script p
 
 - \-n
 
-    If '-' is followed by a number, as in '-156', unmarks the referred task number, not to current.
+    If '-' is followed by a number, as in `-156`, unmarks the referred task number, not to current.
 
 - action \[args\]
 
-    Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version.  Those that need a task number operate on the current task.  Can be shortened when not ambiguous.   Any action to perform on other task like in '175 delete' is not allowed.
+    Executes a task action, being allowed actions: `add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version`.  Those actions that need a task number operate on the current task.  Actions can be shortened when not ambiguous.   Any action to perform on other task like in `175 delete` is not allowed.
 
 - q, quit, exit, bye
 
-    Terminate script execution.
-
-
+    Terminate script execution at this point.  On exit the last reviewed task number is shown.
 
 # DEPENDENCIES
 
