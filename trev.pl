@@ -108,6 +108,12 @@ my $STRING_MSG_HLP = "Commands:   +                  Mark task\n" .
 my ( $major, $minor ) = split( /\./, `task --version` );
 if ( $major < 2 || ($major == 2 && $minor < 2)) { goingout( "$STRING_MSG_VER\n" , 10 , "off" ); } # exit
 
+# preserving command line flags:
+my $CL_LOWER   = 0 ;
+my $CL_UPPER   = 0 ;
+my $CL_SELTAG  = 0 ;
+my $CL_FILTER  = 0 ;
+
 # --------------------------------------------------------- Parsing command line arguments
 # command line to parse: $ trev.pl [-t|-T text] [++seltag] [start+] [filter]
 if ( scalar(@ARGV) != 0 ) {
@@ -117,10 +123,12 @@ if ( scalar(@ARGV) != 0 ) {
         my $opt = $1 ;
         if ( $opt eq 't' ) {
             $lower = $ARGV[0] ;
+            $CL_LOWER   = 1 ;
             shift( @ARGV ) ;
         }
         elsif ( $opt eq 'T' ) {
             $upper = $ARGV[0] ;
+            $CL_UPPER   = 1 ;
             shift( @ARGV ) ;
         }
         else {
@@ -134,6 +142,7 @@ if ( scalar(@ARGV) != 0 ) {
         $seltag = "+$1";           # tag that will be used for selection
         $on     = "modify +$1";    # select action
         $off    = "modify -$1";    # unselect action
+        $CL_SELTAG   = 1 ;
         shift(@ARGV);              # pulls $ARGV[0] out ; $ARGV[1] => $ARGV[0]
     }
 
@@ -152,6 +161,9 @@ if ( scalar(@ARGV) != 0 ) {
         }
     }
     $filter = join( ' ', @ARGV );   # the rest of the line is considered filter
+    if( $filter ne "" ) {
+        $CL_FILTER   = 1 ;
+    }        
 }
 
 # -------------------------------------------------------------------------------- rc file
@@ -222,6 +234,7 @@ else {
                 }
                 elsif( $1 eq $canbemode ) { # and single, down
                     $MODE_TYPE = 2 ;  # is a single mode
+                    $CL_FILTER = 0 ;  # filter is not the mode name
                     push( @temppar , $4 ) ;
                     push( @tempval , $5 ) ;
                 }
@@ -233,6 +246,7 @@ else {
                 
                 if ( ( $3 eq "" ) && ( $1 eq $mode_root ) ) {  # common multi-step config
                     $MODE_TYPE = 3 ;  # is a multi mode
+                    $CL_FILTER = 0 ;  # filter is not the mode name
                     unshift( @multilines , $rcline ) ;  # common prior to individual
                     next ;
                 }
@@ -299,12 +313,12 @@ else {
             $value =~ s/\s*$// ;
             $value =~ s/^[\'|\"]// ; 
             $value =~ s/[\'|\"]$// ; 
-            if(    $param eq "seltag"   ) { $seltag   = $value }
-            elsif( $param eq "on"       ) { $on       = $value }
-            elsif( $param eq "off"      ) { $off      = $value }
-            elsif( $param eq "filter"   ) { $filter   = $value }
-            elsif( $param eq "upper"    ) { $upper    = $value }
-            elsif( $param eq "lower"    ) { $lower    = $value }
+            if(    $param eq "seltag"   ) { if( $CL_SELTAG == 0 ) { $seltag   = $value } }
+            elsif( $param eq "on"       ) { if( $CL_SELTAG == 0 ) { $on       = $value } }
+            elsif( $param eq "off"      ) { if( $CL_SELTAG == 0 ) { $off      = $value } }
+            elsif( $param eq "filter"   ) { if( $CL_FILTER == 0 ) { $filter   = $value } }
+            elsif( $param eq "upper"    ) { if( $CL_UPPER  == 0 ) { $upper    = $value } }
+            elsif( $param eq "lower"    ) { if( $CL_LOWER  == 0 ) { $lower    = $value } }
             elsif( $param eq "L10N"     ) { $L10N     = $value }
             elsif( $param eq "viewinfo" ) { $viewinfo = $value }
             elsif( $param eq "showtime" ) { $showtime = $value }
