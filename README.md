@@ -4,21 +4,21 @@
 
 # NAME
 
-trev.pl - taskwarrior tasks reviewing script
+trev.pl - taskwarrior review
 
 # SYNOPSIS
 
-perl trev.pl \[++mark\] \[start+\] \[filter\]
+perl trev.pl \[-t|T\] \[++mark\] \[start+\] \[filter\]
 
 # DESCRIPTION
 
-trev is sort of a mini-shell focusing on taskwarrior reviewing.
+This script reads a list of taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; issued action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.  Take into account that actions issued by the user, as well as other events, can alter the list along the review process, so after every potentially changing action the list is re-read. 
 
-This script reads a list of pending taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; issued action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.
+At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the marking tag can be modified by the user as an option at the command line or pre-configured in the configuration file.
 
-At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the tag can be modified by the user as an option at the command line or pre-configured in the dot file.
+Apart from specifying options, marks, filters in the command line call to the script, a mode name can be issued, as in `$ trev calls` --refering to one of the review modes defined in the configuration file-- provoking a pre-configured review, single or cascaded.
 
-Tasks list comes from a system call to taskwarrior, obeying then the user preferred settings for visibility, order, decoration...
+Tasks lists come from system calls to taskwarrior, obeying then the user preferred settings for visibility, order, decoration...
 
 # OPTIONS/ARGUMENTS
 
@@ -28,19 +28,15 @@ No options/arguments are required.  Options to set additional text in upper and/
 
 ## COMMAND LINE OPTIONS
 
-- `\-T 'Additional text'`
+- `\-T 'Additional text'` , `\-t 'Additional text'` 
 
-Adds 'Additional text' to the upper label, as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
-
-- `\-t 'Additional text'`
-
-Adds 'Additional text' to the lower label, as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
+Add 'Additional text' to the upper (-T) or lower (-t) label, as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
 
 ## ARGUMENTS
 
 - \[++mark\]
 
-    If first argument starts with '++', as in `trev.pl ++mark`, the marking tag will be set to '+mark', marking action to `modify +mark` and unmarking action to `modify -mark`.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + `modify`).
+    If first argument after options starts with '++', as in `trev.pl ++mark`, the marking tag will be set to '+mark', marking action to `modify +mark` and unmarking action to `modify -mark`.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + `modify`).
 
 - \[start+\]
 
@@ -58,11 +54,11 @@ See EXAMPLES below
 
 ## OPTIONS AT THE SCRIPT PROMPT
 
-After displaying a progress bar, marked tasks and the current task, the script prompts for an action.  At this prompt you can issue this actions (entering them with \[RET\]):
+After clearing the console, displaying a progress bar, an upper, separating label, the set of currently marked tasks, a lower, separating label and the current task, the script prompts for an action.  At this prompt the following actions can issued (entering them with \[RET\]):
 
-- \[RET\]
+- \[RET\] (void line)
 
-    \[RETURN\] or void line.  No action.  Proceeds to the next task.
+    No action: proceeds to the next task.
 
 - b
 
@@ -78,11 +74,17 @@ After displaying a progress bar, marked tasks and the current task, the script p
 
 - \-n
 
-    If '-' is followed by a number, as in `-156`, unmarks the referred task number, not to current.
+    If '-' is followed by a number, as in `-156`, unmarks the referred task number, not the current.
 
-- action \[args\]
+- taskvarrior command \[args\]
 
-    Executes a task action, being allowed actions: `add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version`.  Those actions that need a task number operate on the current task.  Actions can be shortened when not ambiguous.   Any action to perform on other task like in `175 delete` is not allowed.
+    Executes an allowed taskwarrior action, being allowed actions:
+
+    - `annotate, append, delete, denotate, done, duplicate, edit, information, modify, prepend, start, and stop`.
+
+    - `add, calendar, log, undo and version`.
+
+    Those taskwarrior commands that need a task number (first group) operate on the current task.  Commands can be shortened when not ambiguous.   Any command to perform on other --not the current-- task like in `175 delete` (when e.g.: 37 is the current) is not allowed.
 
 - q, quit, exit, bye
 
