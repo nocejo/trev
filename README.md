@@ -163,7 +163,7 @@ Default `trev` behavior can be configured, as well as pre-configured *review mod
 
 ## trevrc
 
-`trevrc` is an optional plain text file that can contain configuration instructions for `trev` and is looked for and read at the beginning of every execution.  Instructions in this file are in the form:
+`trevrc` (or `.trevrc` depending on the location), is an optional plain text file that can contain configuration instructions for `trev` and is looked for and read at the beginning of every execution.  Instructions in this file are in the form:
 ```
 review.mode.parameter = value
 ```
@@ -171,7 +171,9 @@ where 'review' must be always present as is, 'mode' names a *review mode*, 'para
 ```
 review.default.L10N       = esp-ESP
 ```
-Any number of blanks or tabs can be used before, after or between the three tokens `review.mode.parameter`, `=` and `value`, but if `value` have to contain blank spaces enclosed between quotations, including the case where blanks are desired to appear at the beginning or at the end ot the string, like in: 
+specifies that the spanish localization must be used instead of the hard wired default eng-USA.
+
+Any number of blanks or tabs can be used before, after or between the three tokens 'review.mode.parameter', '=' and 'value'; but if 'value' has to contain blank spaces it must be enclosed between quotations, including the case where blanks are desired to appear at the beginning or at the end ot the string, like in: 
 ```
 review.wp5*.upper        = '                 **IMPORTANT**'
 ```
@@ -180,7 +182,7 @@ No shell escaping is needed.
 The following paths are searched for this file in order:
 
 - `~/.task/trevrc`
-- `~/.trevrc` (note de dot, hidden file).
+- `~/.trevrc` (note the dot, hidden file).
 - `script dir/trevrc` (mainly for development+repository purposes)
 
 First file found is used.
