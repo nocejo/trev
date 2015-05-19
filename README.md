@@ -107,7 +107,7 @@ You will need to install it from your distribution (this is libterm-readline-gnu
 
 # CONFIGURATION
 
-No configuration is necessary if you can go with the hard wired defaults (see [FILES][#files] for parameter details).  Otherwise the script source code can be edited or a configuration file can be created.
+No configuration is necessary if you can go with the hard wired defaults (see FILES for parameter details).  Otherwise the script source code can be edited or a configuration file can be created.
 
 ## Source code
 
@@ -115,7 +115,7 @@ Hard wired defaults (mark tag and marking actions, filter, upper and lower label
 
 ## Configuration file
 
-Default `trev` behavior can be configured, as well as pre-configured _review modes_ can be defined, in an optional configuration file named `.trevrc`.  See FILES for `.trevrc` syntax and semantics.
+Default `trev` behavior can be configured, as well as pre-configured *review modes* can be defined in an optional configuration file named `trevrc` or `.trevrc`.  See FILES for `trevrc` syntax and semantics.
 
 # EXAMPLES 
 
@@ -161,7 +161,39 @@ Default `trev` behavior can be configured, as well as pre-configured _review mod
 
 # FILES
 
-No specific files are used, but the script issues system calls to 'task', and this is the expected name of the task executable. This can be modified inside the source code.
+## trevrc
+
+`trevrc` is an optional plain text file that can contain configuration instructions for `trev` and is looked for and read at the beginning of every execution.  Instructions in this file are in the form:
+```
+review.mode.parameter = value
+```
+where 'review' must be always present as is, 'mode' names a *review mode*, 'parameter' refers to an specific behavioral aspect and 'value' concretes this behavior. So:
+```
+review.default.L10N       = esp-ESP
+```
+Any number of blanks or tabs can be used before, after or between the three tokens `review.mode.parameter`, `=` and `value`, but if `value` have to contain blank spaces enclosed between quotations, including the case where blanks are desired to appear at the beginning or at the end ot the string, like in: 
+```
+review.wp5*.upper        = '                 **IMPORTANT**'
+```
+No shell escaping is needed.
+
+The following paths are searched for this file in order:
+
+- `~/.task/trevrc`
+- `~/.trevrc` (note de dot, hidden file).
+- `script dir/trevrc` (mainly for development+repository purposes)
+
+First file found is used.
+
+## Default behavior in trevrc
+
+Default behavior for `trev` can be configured by defining the special review mode 'default' in `trevrc`
+
+
+
+
+
+The script issues system calls to 'task', and this is the expected name of the task executable. This can be modified inside the source code.
 
 # CAVEATS
 
