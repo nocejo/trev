@@ -107,7 +107,7 @@ You will need to install it from your distribution (this is libterm-readline-gnu
 
 # CONFIGURATION
 
-No configuration is necessary if you can go with the hard wired defaults (see [FILES][] for parameter details).  Otherwise the script source code can be edited or a configuration file can be created.
+No configuration is necessary if you can go with the hard wired defaults (see [FILES][#files] for parameter details).  Otherwise the script source code can be edited or a configuration file can be created.
 
 ## Source code
 
