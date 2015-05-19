@@ -16,7 +16,7 @@ This script reads a list of taskwarrior (http://taskwarrior.org/) tasks and pres
 
 At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the marking tag can be modified by the user as an option at the command line or pre-configured in the configuration file.
 
-Apart from specifying options, marks, filters in the command line call to the script, a mode name can be issued, as in `$ trev calls` --refering to one of the review modes defined in the configuration file-- provoking a pre-configured review, single or cascaded.
+Apart from specifying options, marks, filters in the command line call to the script, a mode name can be issued, as in `$ trev calls` --refering to one of the review modes defined in the configuration file-- provoking a pre-configured review, single or cascaded; see CONFIGURATION and FILES.
 
 Tasks lists come from system calls to taskwarrior, obeying then the user preferred settings for visibility, order, decoration...
 
@@ -84,7 +84,7 @@ After clearing the console, displaying a progress bar, an upper, separating labe
 
     - `add, calendar, log, undo and version`.
 
-    Those taskwarrior commands that need a task number (first group) operate on the current task.  Commands can be shortened when not ambiguous.   Any command to perform on other --not the current-- task like in `175 delete` (when e.g.: 37 is the current) is not allowed.
+    Those taskwarrior commands that need a task number (first group) operate on the current task.  Commands can be shortened when not ambiguous.   Any command to perform on other --not the current-- task like in `175 delete` (when e.g.: 37 is the current one) is not allowed.
 
 - q, quit, exit, bye
 
@@ -94,21 +94,30 @@ After clearing the console, displaying a progress bar, an upper, separating labe
 
 Taskwarrior 2.2.0+ must be installed.
 
-Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine .  But some do not:
+Some needed modules ship with perl (as of 5.06):
 
-- Term::ReadLine::Gnu
+- Term::ANSIColor
+- Term::ReadLine
 
-    Perl extension for the GNU Readline/History Library.
+But some do not:
+
+- Term::ReadLine::Gnu (Perl extension for the GNU Readline/History Library)
 
 You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or get it from CPAN.
 
 # CONFIGURATION
 
-Defaults (mark and marking actions, prompt text, label and separator styles) can be modified directly in the Configuration section of the script source code.  Perl is an interpreted scripting language, so no compilation or building is needed.
+No configuration is necessary if you can go with the hard wired defaults (see FILES for parameter details).  Otherwise the script source code can be edited or a configuration file can be created.
 
-Currently you can choose between two localizations: en-US and es-ES.  This is done in the L10N section of the source code, uncommenting the localized STRINGs in your preferred localization and commenting out the other set.
+## Source code
 
-# EXAMPLES
+Hard wired defaults (mark tag and marking actions, filter, upper and lower labels, localization, info view, time counter, prompt text, label and separator styles) can be modified directly in the Configuration section of the script source code.  As perl is an interpreted scripting language, no compilation or build is needed.  Currently you can choose between two localizations: eng-USA and esp-ESP.
+
+## Configuration file
+
+Default `trev` behavior can be configured, as well as pre-configured _review modes_ can be defined, in an optional configuration file named `.trevrc`.  See FILES for `.trevrc` syntax and semantics.
+
+# EXAMPLES 
 
 - trev.pl
 
