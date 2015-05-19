@@ -173,27 +173,61 @@ review.default.L10N       = esp-ESP
 ```
 specifies that the spanish localization must be used instead of the hard wired default eng-USA.
 
-Any number of blanks or tabs can be used before, after or between the three tokens 'review.mode.parameter', '=' and 'value'; but if 'value' has to contain blank spaces it must be enclosed between quotations, including the case where blanks are desired to appear at the beginning or at the end ot the string, like in: 
+Any number of blanks or tabs can be used before, after or between the three tokens 'review.mode.parameter', '=' and 'value'; but if in 'value' blanks are desired to appear at the beginning or at the end ot the string, like in: 
 ```
-review.wp5*.upper        = '                 **IMPORTANT**'
+review.wp5*.upper        = '           **THIS IS IMPORTANT**'
 ```
-No shell escaping is needed.
+it must be enclosed between quotations.  No shell escaping is needed.
 
-The following paths are searched for this file in order:
+The following paths are searched, in this order, for the configuration file:
 
 - `~/.task/trevrc`
 - `~/.trevrc` (note the dot, hidden file).
-- `script dir/trevrc` (mainly for development+repository purposes)
+- `[trev.pl script dir]/trevrc` (mainly for development+repository purposes)
 
 First file found is used.
 
 ## Default behavior in trevrc
 
-Default behavior for `trev` can be configured by defining the special review mode 'default' in `trevrc`
+Default behavior --different from hard wired defaults-- for `trev` can be configured by defining the special review mode 'default' in the configuration file. An example default mode follows:
+```
+# ------------------------------------------------- default mode
+review.default.seltag     = active
+review.default.on         = start
+review.default.off        = stop
+review.default.filter     = 
+
+review.default.L10N       = esp-ESP
+review.default.viewinfo   = off
+review.default.showtime   = on
+
+review.default.prompt     = 'trev> '     # quotes to include blank
+review.default.upper      = 
+review.default.lower      = [modo por defecto]
+review.default.lblstyle   = reverse bold
+review.default.sepstyle   = underline bold
+```
+Blank/void lines as well as anything following a '#' character is ignored.
+
+## Parameter and hard wired defaults
+
+Explanations concerning parameters follow, indicating the hard wired defaults:
+
+- seltag: (active)
+- on: (start)
+- off: (stop)
+- filter: ('')
+- L10N: (eng-USA)
+- viewinfo: (on)
+- showtime: (on)
+- prompt: ('trev> ')
+- upper: ('')
+- lower: ('')
+- lblstyle: (reverse bold)
+- sepstyle: (underline bold)
 
 
-
-
+## Taskwarrior executable
 
 The script issues system calls to 'task', and this is the expected name of the task executable. This can be modified inside the source code.
 
@@ -201,7 +235,7 @@ The script issues system calls to 'task', and this is the expected name of the t
 
 This is a slow script, specially when --after an action-- the order or number of tasks changes and next task must be located through its uuid.
 
-In principle the script is intended to be used off-line, but if orders can come in any form from the web, beware: system calls are issued through backticks and any security check is performed.
+In principle the script is intended to be used off-line, but if orders can come in any form from the web, beware: system calls are issued through perl backticks and any security check is performed.
 
 # BUGS
 
@@ -211,7 +245,7 @@ Probably.
 
 # AUTHOR
 
-Fidel Mato <fidel.mato at gmail.com>.
+Fidel Mato \<fidel.mato at gmail.com\>.
 
 # COPYRIGHT AND LICENSE
 
