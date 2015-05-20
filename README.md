@@ -1,6 +1,6 @@
 # WARNING
 
-2015-04-12 Documentation needs updating to include recent changes, in particular new rc file.
+2015-05-20 Documentation needs updating to include recent changes, in particular concerning the new configuration file.
 
 # NAME
 
