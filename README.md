@@ -219,11 +219,11 @@ Explanations concerning parameters follow, indicating the hard wired defaults:
 
 - on
 
-    (start) Taskworrior command that makes the current task part of the selected set. (More usually this would be something as 'modify +markingtag'.
+    (start) Taskwarrior command that makes the current task part of the selected set. (More usually this would be something as 'modify +markingtag'.
 
 - off
 
-    (stop) Taskworrior command that takes out the current task part from the selected set.
+    (stop) Taskwarrior command that takes out the current task part from the selected set.
 
 - filter
 
@@ -247,19 +247,20 @@ Explanations concerning parameters follow, indicating the hard wired defaults:
 
 - upper
 
-    ('')
+    ('') Additional text to appear at the upper label.
 
 - lower
 
-    ('')
+    ('') Additional text to appear at the lower label.
 
 - lblstyle
 
-    (reverse bold)
+    (reverse bold) Decoration style for labels.  It depends on the capabilities of the console. 
 
 - sepstyle
 
-    (underline bold)
+    (underline bold) Decoration style for the separation between panel (counter, selected, task, labels) and prompt line.  It depends on the capabilities of the console. 
+
 
 
 
