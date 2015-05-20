@@ -239,7 +239,7 @@ In principle the script is intended to be used off-line, but if orders can come 
 
 # BUGS
 
-Probably.
+https://github.com/nocejo/trev/issues
 
 
 
@@ -249,7 +249,7 @@ Fidel Mato \<fidel.mato at gmail.com\>.
 
 # COPYRIGHT AND LICENSE
 
-Copyright 2013, Fidel Mato
+Copyright 2013-2015, Fidel Mato
 
 trev.pl is released under the MIT license.
 
@@ -275,4 +275,4 @@ http://www.opensource.org/licenses/mit-license.php
 
 # DATE
 
-12-Apr-2015
+20-May-2015
