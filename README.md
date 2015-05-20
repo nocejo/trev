@@ -262,7 +262,30 @@ Explanations concerning parameters follow, indicating the hard wired defaults:
     (underline bold) Decoration style for the separation between panel (counter, selected, task, labels) and prompt line.  It depends on the capabilities of the console. 
 
 
+## Named reviews
 
+Parameter values for specific, frequent reviews can be defined in the configuration file and invoked in an easier way from the command line using its *name* as an argument:
+```
+$ trev calls
+```
+Definition of a named review is performed by issuing configuration instructions refering to the name in trevrc, e.g.: for the review named calls:
+```
+# ------------------------------------------------------------- Calls
+review.calls.filter      = +phone urgency.over:12 +READY
+review.calls.seltag      = +call
+review.calls.on          = mod +call
+review.calls.off         = mod -call
+review.calls.prompt      = 'trev calls> '  # quotes to include blank
+review.calls.upper       = Make these phone calls!
+review.calls.lower       = These are high-urgency actionable tasks!
+```
+
+Those parameter undefined for the review (here lblstyle and sepstyle) are taken from defaults, so a named review can be defined with a single line in trevrc:
+```
+review.tod.filter = due.after:yesterday and due.before:tomorrow status:pending and -rev
+```
+
+## Cascaded named reviews
 
 
 
