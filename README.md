@@ -16,7 +16,7 @@ This script reads a list of taskwarrior (http://taskwarrior.org/) tasks and pres
 
 At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the marking tag can be modified by the user as an option at the command line or pre-configured in the configuration file.
 
-Apart from specifying options, marks, filters in the command line call to the script, a mode name can be issued, as in `$ trev calls` --refering to one of the review modes defined in the configuration file-- provoking a pre-configured review, single or cascaded; see CONFIGURATION and FILES.
+Apart from specifying options, marks, filters in the command line call to the script, a *named review* can be issued, as in `$ trev calls` --refering to one of the named reviews defined in the configuration file-- provoking a pre-configured review, single or cascaded; see CONFIGURATION and FILES.
 
 Tasks lists come from system calls to taskwarrior, obeying then the user preferred settings for visibility, order, decoration...
 
@@ -115,7 +115,7 @@ Hard wired defaults (mark tag and marking actions, filter, upper and lower label
 
 ## Configuration file
 
-Default `trev` behavior can be configured, as well as pre-configured *review modes* can be defined in an optional configuration file named `trevrc` or `.trevrc`.  See FILES for `trevrc` syntax and semantics.
+Default `trev` behavior can be configured, as well as pre-configured *named reviews* can be defined in an optional configuration file named `trevrc` or `.trevrc`.  See FILES for `trevrc` syntax and semantics.
 
 # EXAMPLES 
 
@@ -165,15 +165,15 @@ Default `trev` behavior can be configured, as well as pre-configured *review mod
 
 `trevrc` (or `.trevrc` depending on the location), is an optional plain text file that can contain configuration instructions for `trev` and is looked for and read at the beginning of every execution.  Instructions in this file are in the form:
 ```
-review.mode.parameter = value
+review.name.parameter = value
 ```
-where 'review' must be always present as is, 'mode' names a *review mode*, 'parameter' refers to an specific behavioral aspect and 'value' concretes this behavior. So:
+where 'review' must be always present as is, 'name' names a *named review*, 'parameter' refers to an specific behavioral aspect and 'value' concretes this behavior. So:
 ```
 review.default.L10N       = esp-ESP
 ```
 specifies that the spanish localization must be used instead of the hard wired default eng-USA.
 
-Any number of blanks or tabs can be used before, after or between the three tokens 'review.mode.parameter', '=' and 'value'; but if in 'value' blanks are desired to appear at the beginning or at the end ot the string, like in: 
+Any number of blanks or tabs can be used before, after or between the three tokens 'review.name.parameter', '=' and 'value'; but if in 'value' blanks are desired to appear at the beginning or at the end ot the string, like in: 
 ```
 review.wp5*.upper        = '           **THIS IS IMPORTANT**'
 ```
@@ -189,13 +189,13 @@ First file found is used.
 
 ## Default behavior in trevrc
 
-Default behavior --different from hard wired defaults-- for `trev` can be configured by defining the special review mode 'default' in the configuration file. An example default mode follows:
+Default behavior --different from hard wired defaults-- for `trev` can be configured by defining the special named review 'default' in the configuration file. An example default set of parameters follows:
 ```
-# ------------------------------------------------- default mode
-review.default.seltag     = active
-review.default.on         = start
-review.default.off        = stop
-review.default.filter     = 
+# ------------------------------------------------- default behavior/parameters
+review.default.seltag     = +hard  +donow
+review.default.on         = modify +donow
+review.default.off        = modify -donow
+review.default.filter     = +hard
 
 review.default.L10N       = esp-ESP
 review.default.viewinfo   = off
@@ -203,7 +203,7 @@ review.default.showtime   = on
 
 review.default.prompt     = 'trev> '     # quotes to include blank
 review.default.upper      = 
-review.default.lower      = [modo por defecto]
+review.default.lower      = [modo por defecto: hard=>donow]
 review.default.lblstyle   = reverse bold
 review.default.sepstyle   = underline bold
 ```
@@ -213,18 +213,56 @@ Blank/void lines as well as anything following a '#' character is ignored.
 
 Explanations concerning parameters follow, indicating the hard wired defaults:
 
-- seltag: (active)
-- on: (start)
-- off: (stop)
-- filter: ('')
-- L10N: (eng-USA)
-- viewinfo: (on)
-- showtime: (on)
-- prompt: ('trev> ')
-- upper: ('')
-- lower: ('')
-- lblstyle: (reverse bold)
-- sepstyle: (underline bold)
+- seltag
+
+    (active) Tag (or report) used as mark for selected tasks.
+
+- on
+
+    (start) Taskworrior command that makes the current task part of the selected set. (More usually this would be something as 'modify +markingtag'.
+
+- off
+
+    (stop) Taskworrior command that takes out the current task part from the selected set.
+
+- filter
+
+    ('') Expression that Taskwarrior will use as filter to get the task(s) to review. 
+
+- L10N
+
+    (eng-USA) Localization used for program messages.  Values can be {eng-USA , esp-ESP}.
+
+- viewinfo
+
+    (on) This switch (on/off) causes the program to show (or not) detailed information on the task being reviewed.
+
+- showtime
+
+    (on) This switch (on/off) makes the program show time spent in the review at exit.
+
+- prompt
+
+    ('trev> ')
+
+- upper
+
+    ('')
+
+- lower
+
+    ('')
+
+- lblstyle
+
+    (reverse bold)
+
+- sepstyle
+
+    (underline bold)
+
+
+
 
 
 ## Taskwarrior executable
