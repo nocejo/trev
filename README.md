@@ -16,7 +16,7 @@ This script reads a list of taskwarrior (http://taskwarrior.org/) tasks and pres
 
 At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the marking tag can be modified by the user as an option at the command line or pre-configured in the configuration file.
 
-Apart from specifying options, marks, filters in the command line call to the script, a *named review* can be issued, as in `$ trev calls` --refering to one of the named reviews defined in the configuration file-- provoking a pre-configured review, single or cascaded; see CONFIGURATION and FILES.
+Apart from specifying options, marks, filters in the command line call to the script, a *named review* can be issued, as in `$ trev calls` --referring to one of the named reviews defined in the configuration file-- provoking a pre-configured review, single or cascaded; see CONFIGURATION and FILES.
 
 Tasks lists come from system calls to taskwarrior, obeying then the user preferred settings for visibility, order, decoration...
 
@@ -76,7 +76,7 @@ After clearing the console, displaying a progress bar, an upper, separating labe
 
     If '-' is followed by a number, as in `-156`, unmarks the referred task number, not the current.
 
-- taskvarrior command \[args\]
+- taskwarrior command \[args\]
 
     Executes an allowed taskwarrior action, being allowed actions:
 
@@ -173,7 +173,7 @@ review.default.L10N       = esp-ESP
 ```
 specifies that the spanish localization must be used instead of the hard wired default eng-USA.
 
-Any number of blanks or tabs can be used before, after or between the three tokens 'review.name.parameter', '=' and 'value'; but if in 'value' blanks are desired to appear at the beginning or at the end ot the string, like in: 
+Any number of blanks or tabs can be used before, after or between the three tokens 'review.name.parameter', '=' and 'value'; but if in 'value' blanks are desired to appear at the beginning or at the end of the string, like in: 
 ```
 review.wp5*.upper        = '           **THIS IS IMPORTANT**'
 ```
@@ -268,7 +268,7 @@ Parameter values for specific, frequent reviews can be defined in the configurat
 ```
 $ trev calls
 ```
-Definition of a named review is performed by issuing configuration instructions refering to the name in trevrc, e.g.: for the review named calls:
+Definition of a named review is performed by issuing configuration instructions referring to the name in trevrc, e.g.: for the review named calls:
 ```
 # ------------------------------------------------------------- Calls
 review.calls.filter      = +phone urgency.over:12 +READY
@@ -280,14 +280,67 @@ review.calls.upper       = Make these phone calls!
 review.calls.lower       = These are high-urgency actionable tasks!
 ```
 
-Those parameter undefined for the review (here lblstyle and sepstyle) are taken from defaults, so a named review can be defined with a single line in trevrc:
+Those parameter undefined for the review (lblstyle and sepstyle in the example) are taken from defaults, so a named review can be defined with a single line in trevrc:
 ```
 review.tod.filter = due.after:yesterday and due.before:tomorrow status:pending and -rev
 ```
+that takes every other parameter from defaults.
+
 
 ## Cascaded named reviews
 
+Complex review patterns can benefit from a sequential structure as multi-step, multi-level or cascaded sets of reviews, that can be oriented to grouping together, progressively refining, etc.  Named reviews can be used in `trev` in a standalone way or cascaded, i.e.: starting at an specific named review, and when this one is finished the user is asked whether to stop the sequence or to continue with next named review in the sequence, until it finishes.  Sequence can be entered at any single named review, not necessarily at the beginning, and proceeding from there on, so the user can stop and resume later a formerly interrupted (between two steps) review.
 
+Definition of a cascaded review is performed in the configuration file as an *ordered* group of named reviews sharing a common prefix in its name, being this prefix separated from the specific name of the step by a '*' character and preceding it.  An example follows for a cascaded review that performs the reviewing of a certain wp5 project in two steps: first tasks with a deadline and then those without one: 
+```
+# ----------------------------------------------- wp5 multi
+review.wp5*.filter       = pro:wp5
+review.wp5*.upper        = '                 **IMPORTANT**'
+
+review.wp5*due.filter    = pro:wp5 and due.any:  # deadline
+review.wp5*due.lower     = This is wp5-due
+
+review.wp5*notdue.filter = pro:wp5 and due.none: # no deadline
+review.wp5*notdue.lower  = This is wp5-notdue
+```
+The first group, `wp5*`, without any specific step name, is used as a container for parameters common to all steps, but those parameter can be overwritten by definitions in single steps. So, `review.wp5*.filter` is here of any use because every step defines its own, overwriting filter; but `review.wp5*.upper` is used by `wp5*due` and `wp5*notdue` because `upper` is not defined for them.  Every other parameter is taken from defaults.  Order of the groups establishes the step review order: first single named review is addressed first, then second and so on.
+
+Cascaded reviews are invoked with its prefix, followed or not by '*':
+```
+$ trev wp5
+```
+or
+```
+$ trev wp5*
+```
+
+and starts with `wp5*due`, proceeding till the natural end of it of when the user interrupts the review by means of the usual terminating commands: `q`, `quit`, `exit` or `bye`.  At this point the user is informed and prompted:
+```
+#
+# Multi-step review (wp5):
+#
+#   Finished step : wp5*due
+#   Next step     : wp5*notdue
+#
+
+Proceed [RET] or [quit]? > 
+```
+If `q[uit]` (plus `[RET]`) is issued the whole review is terminated.  If `[RET]` is issued instead the program proceeds with the `wp5*notdue` step till this end or termination, when the user is informed:
+```
+#
+# Multi-step review (wp5):
+#
+#   Finished step : wp5*notdue (last)
+#
+```
+and the cascaded review is finished.
+
+As previously said, the sequence can be entered at an intermediate review:
+```
+$ trev wp5*notdue
+```
+
+following afterwards the usual course.
 
 ## Taskwarrior executable
 
