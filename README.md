@@ -1,10 +1,6 @@
-# WARNING
-
-2015-05-20 Documentation needs updating to include recent changes, in particular concerning the new configuration file.
-
 # NAME
 
-trev.pl - taskwarrior review
+trev.pl - Taskwarrior review
 
 # SYNOPSIS
 
@@ -12,7 +8,7 @@ perl trev.pl \[-t|T\] \[++mark\] \[start+\] \[filter\]
 
 # DESCRIPTION
 
-This script reads a list of taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; issued action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.  Take into account that actions issued by the user, as well as other events, can alter the list along the review process, so after every potentially changing action the list is re-read. 
+This perl script reads a list of taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; issued action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.  Take into account that actions issued by the user, as well as other events, can alter the list along the review process, so after every potentially changing action the list is re-read. 
 
 At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the marking tag can be modified by the user as an option at the command line or pre-configured in the configuration file.
 
@@ -80,9 +76,9 @@ After clearing the console, displaying a progress bar, an upper, separating labe
 
     Executes an allowed taskwarrior action, being allowed actions:
 
-    - `annotate, append, delete, denotate, done, duplicate, edit, information, modify, prepend, start, and stop`.
+    -`annotate, append, delete, denotate, done, duplicate, edit, information, modify, prepend, start, stop`
 
-    - `add, calendar, log, undo and version`.
+    -`add, calendar, log, undo, version`
 
     Those taskwarrior commands that need a task number (first group) operate on the current task.  Commands can be shortened when not ambiguous.   Any command to perform on other --not the current-- task like in `175 delete` (when e.g.: 37 is the current one) is not allowed.
 
@@ -105,6 +101,7 @@ But some do not:
 
 You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or get it from CPAN.
 
+
 # CONFIGURATION
 
 No configuration is necessary if you can go with the hard wired defaults (see FILES for parameter details).  Otherwise the script source code can be edited or a configuration file can be created.
@@ -117,46 +114,74 @@ Hard wired defaults (mark tag and marking actions, filter, upper and lower label
 
 Default `trev` behavior can be configured, as well as pre-configured *named reviews* can be defined in an optional configuration file named `trevrc` or `.trevrc`.  See FILES for `trevrc` syntax and semantics.
 
-# EXAMPLES 
+## INSTALL
 
-- trev.pl
+In order to simplify shell calls to `perl trev.pl` and to avoid shell interpolation of arguments two ways can be followed:
 
-    Reviews all visible tasks (user default filter), starts reviewing at first of them (default), mark/unmark current task with start/stop (default).
+1. Add an alias in your `.bashrc` , `.bash_aliases` or similar:
 
-- trev.pl ++week
+```
+alias trev='perl ~/path/to/the/script/trev.pl'
+```
 
-    Set marking tag to +week and mark/unmark current task with 'modify +week'/'modify -week'.
+2. Create an executable shell script somewhere in your path (`~/bin/trev`), containing: 
 
-- trev.pl ++calendula +ate\_loops
+```
+#!/bin/sh
+perl ~/path/to/the/script/trev.pl $*
+```
+Use it, in both cases, as:
 
-    Mark/unmark using 'modify +/-calendula'; Reviews only ate\_loops tagged tasks.
+```
+$ trev arguments
+```
 
-- trev.pl ++deleg 113+ pro:wp5
+Allowing or not shell interpolation of arguments may cause different behavior.
 
-    Set marking tag to +deleg, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
 
-- trev.pl 113+ due:
+# EXAMPLES
+
+`trev` trev can be replaced by `perl ~/path/to/the/script/trev.pl`
+
+- `trev`
+
+    Reviews tasks (user's task default filter), starts reviewing at first of them (default), mark/unmark current task with start/stop (default).
+
+- `trev ++week`
+
+    Sets marking tag to +week and mark/unmark current task with 'modify +week'/'modify -week'.
+
+- `trev ++calendula +ate\_loops`
+
+    Mark/unmark using 'modify +/-calendula'; reviews only ate\_loops tagged tasks.
+
+- `trev ++deleg 113+ pro:wp5`
+
+    Sets marking tag to +deleg, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
+
+- `trev 113+ due:`
 
     Processes only tasks without a due date.  Start at task 113.  Mark/unmark with start/stop and starts at the top of the list (defaults).
 
-- trev.pl ++NOW overdue
+- `trev ++NOW overdue`
 
     Processes overdue tasks.  Mark/unmark with 'modify +/-NOW'.
 
-- trev.pl 113
+- `trev 113`
 
     Reviews just task 113.  Start/stop for mark/unmark (default).
 
-- trev.pl amsterdam
+- `trev amsterdam`
 
-    Review every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
+    Reviews every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
 
-- trev -T 'Make these phone calls\\!' -t 'These are high-urgency actionable tasks!' ++call  urgency.over:12 +READY
+- `trev -T 'Make these phone calls\\!' -t 'These are high-urgency actionable tasks!' ++call  urgency.over:12 +READY`
 
-    Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping quotation marks.
+    Reviews every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping quotation marks.
 
+- `trev wp5`
 
-
+    Reviews tasks following settings in a single or cascaded named review defined in the configuration file. 
 
 
 # FILES
@@ -171,7 +196,7 @@ where 'review' must be always present as is, 'name' names a *named review*, 'par
 ```
 review.default.L10N       = esp-ESP
 ```
-specifies that the spanish localization must be used instead of the hard wired default eng-USA.
+specifies that the Spanish localization must be used instead of the hard wired default eng-USA.
 
 Any number of blanks or tabs can be used before, after or between the three tokens 'review.name.parameter', '=' and 'value'; but if in 'value' blanks are desired to appear at the beginning or at the end of the string, like in: 
 ```
@@ -291,7 +316,7 @@ that takes every other parameter from defaults.
 
 Complex review patterns can benefit from a sequential structure as multi-step, multi-level or cascaded sets of reviews, that can be oriented to grouping together, progressively refining, etc.  Named reviews can be used in `trev` in a standalone way or cascaded, i.e.: starting at an specific named review, and when this one is finished the user is asked whether to stop the sequence or to continue with next named review in the sequence, until it finishes.  Sequence can be entered at any single named review, not necessarily at the beginning, and proceeding from there on, so the user can stop and resume later a formerly interrupted (between two steps) review.
 
-Definition of a cascaded review is performed in the configuration file as an *ordered* group of named reviews sharing a common prefix in its name, being this prefix separated from the specific name of the step by a '*' character and preceding it.  An example follows for a cascaded review that performs the reviewing of a certain wp5 project in two steps: first tasks with a deadline and then those without one: 
+Definition of a cascaded review is performed in the configuration file as an *ordered* group of named reviews sharing a common prefix in its name, being this prefix separated from the specific name of the step by a '`*`' character and preceding it.  An example follows for a cascaded review that performs the reviewing of a certain wp5 project in two steps: first tasks with a deadline and then those without one: 
 ```
 # ----------------------------------------------- wp5 multi
 review.wp5*.filter       = pro:wp5
@@ -305,7 +330,7 @@ review.wp5*notdue.lower  = This is wp5-notdue
 ```
 The first group, `wp5*`, without any specific step name, is used as a container for parameters common to all steps, but those parameter can be overwritten by definitions in single steps. So, `review.wp5*.filter` is here of any use because every step defines its own, overwriting filter; but `review.wp5*.upper` is used by `wp5*due` and `wp5*notdue` because `upper` is not defined for them.  Every other parameter is taken from defaults.  Order of the groups establishes the step review order: first single named review is addressed first, then second and so on.
 
-Cascaded reviews are invoked with its prefix, followed or not by '*':
+Cascaded reviews are invoked with its prefix, followed or not by '`*`':
 ```
 $ trev wp5
 ```
@@ -390,4 +415,4 @@ http://www.opensource.org/licenses/mit-license.php
 
 # DATE
 
-20-May-2015
+22-May-2015
