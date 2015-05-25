@@ -1,27 +1,26 @@
-# trev.pod
-# Follows http://perldoc.perl.org/perlpodstyle.html
+=encoding utf8
 
-=head1 WARNING
-
-2015-04-12 Documentation needs updating to include recent changes, in particular new rc file.
 
 =head1 NAME
 
-trev.pl - taskwarrior tasks reviewing script
+trev.pl - Taskwarrior review
+
 
 =head1 SYNOPSIS
 
-perl trev.pl [++mark] [start+] [filter]
+perl trev.pl [-t|T] [++mark] [start+] [filter]
+
 
 =head1 DESCRIPTION
 
-trev is sort of a mini-shell focusing on taskwarrior reviewing.
+This perl script reads a list of taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; issued action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.  Take into account that actions issued by the user, as well as other events, can alter the list along the review process, so after every potentially changing action the list is re-read. 
 
-This script reads a list of pending taskwarrior (http://taskwarrior.org/) tasks and presents them to the user one at a time, prompting for an action --among a restricted set of taskwarrior commands; this action (or none) is performed on the task, whereupon the script proceeds to the next task up to the end of the list.
+At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked/unmarked by default as active/stopped, but the marking tag can be modified by the user as an option at the command line or pre-configured in the configuration file.
 
-At the script prompt the user can also include the current into a set of marked tasks which is continuously shown.  Tasks into this set are marked by taskwarrior as active or with a certain tag chosen by the user.
+Apart from specifying options, marks, filters in the command line call to the script, a I<named review> can be issued, as in C<$ trev calls> --referring to one of the named reviews defined in the configuration file-- provoking a pre-configured review, single or cascaded; see CONFIGURATION and FILES.
 
-Tasks list comes from a system call to task, obeying then the user preferred settings for visibility, order, decoration...
+Tasks lists come from system calls to taskwarrior, obeying then the user preferred settings for visibility, order, decoration...
+
 
 =head1 OPTIONS/ARGUMENTS
 
@@ -29,73 +28,126 @@ Command line structure: after the script name a number of option/argument (e.g.:
 
 No options/arguments are required.  Options to set additional text in upper and/or lower labels con be issued. Optional arguments can be issued to set a marking tag, a task number for the review to start and/or a taskwarrior filter.  Order is mandatory (see below).
 
+
 =head2 COMMAND LINE OPTIONS
 
-=item -T 'Additional text'
+=over
 
-Adds 'Additional text' to the upper label, after 'Selected (mark): ', as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
+=item -
 
-=item -t 'Additional text'
+C<\-T 'Additional text'> , C<\-t 'Additional text'> 
 
-Adds 'Additional text' to the upper label, after 'Reviewing filter (n/m): ', as a reminder or explanation.  Quotation marks are required if text contains blank spaces..
+
+=back
+
+Add 'Additional text' to the upper (-T) or lower (-t) label, as a reminder or explanation.  Quotation marks are required if text contains blank spaces.
+
 
 =head2 ARGUMENTS
 
 =over
 
-=item [++mark]
+=item -
 
-If first argument starts with '++', as in 'trev.pl ++mark', the marking tag will be set to '+mark', marking action to 'modify +mark' and unmarking action to 'modify -mark'.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + modify).
+[++mark]
 
-=item [start+]
+If first argument after options starts with '++', as in C<trev.pl ++mark>, the marking tag will be set to '+mark', marking action to C<modify +mark> and unmarking action to C<modify -mark>.  Double '+' is required in order to distinguish from a regular tag intended to be used as a filter.  If not set, default marking attribute is 'active', marking action is 'start' and unmarking action is 'stop' ('active' is not a taskwarrior tag but a report; this is not the more general case, which is intended to use a tag + C<modify>).
 
-A numeric argument ending in '+' as in 'trev.pl 113+' , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in 'trev.pl 113'.
 
-=item [filter]
 
-The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
+=item -
+
+[start+]
+
+A numeric argument ending in '+' as in C<trev.pl 113+> , following an optional '++mark' and preceding any filter, requests the script to start reviewing at task number 113, and proceed to the end of the list.  This can be useful when resuming an interrupted long review.  Final '+' is required in order to distinguish from a just-one-task filter, like in C<trev.pl 113>.
+
+
+
+=item -
+
+[filter]
+
+The rest of the line is taken as a taskwarrior filter --task number(s), report name, tag, dates, bare term... see EXAMPLES below.  May be not all filters can be correctly interpreted.
+
+
 
 =back
 
 Argument/option order is mandatory: option(s) must come first, if at all issued. If a marking tag is specified it must be issued as the first argument following options; starting task number can be first (if no marking tag) or second (first is marking tag) after options.  Filter must go at the end of the line.
 
+
 =head3 EXAMPLES
 
 See EXAMPLES below
 
+
 =head2 OPTIONS AT THE SCRIPT PROMPT
 
-After displaying a progress bar, marked tasks and the current task, the script prompts for an action.  At this prompt you can issue this actions (entering them with [RET]):
+After clearing the console, displaying a progress bar, an upper, separating label, the set of currently marked tasks, a lower, separating label and the current task, the script prompts for an action.  At this prompt the following actions can issued (entering them with [RET]):
 
-=over 8
-
-=item [RET]
-
-[RETURN] or void line.  No action.  Proceeds to the next task.
-
-=item b
-
-Goes back to the previous task.
-
-=item +
-
-Marks task as 'active' (start-ing it, default) or with the requested marking tag.
+=over
 
 =item -
 
+[RET] (void line)
+
+No action: proceeds to the next task.
+
+
+
+=item -
+
+b
+
+Goes back to the previous task.
+
+
+
+=item -
+
++
+
+Marks task as 'active' (start-ing it, default) or with the pre-configured or requested marking tag.
+
+
+
+=item -
+
+-
+
 Unmarks current task and take it out of the 'marked' set.
 
-=item -n
 
-If '-' is followed by a number, as in '-156', unmarks the referred task number, not to current.
 
-=item action [args]
+=item -
 
-Executes a task action, Where allowed actions are: add, annotate, append, calendar, delete, denotate, done, duplicate, edit, information, log, modify, prepend, start, stop, undo and version.  Those that need a task number operate on the current task.  Can be shortened when not ambiguous.   Any action to perform on other task like in '175 delete' is not allowed.
+-n
 
-=item q, quit, exit, bye
+If '-' is followed by a number, as in C<-156>, unmarks the referred task number, not the current.
 
-Terminate script execution.
+
+
+=item -
+
+taskwarrior command [args]
+
+Executes an allowed taskwarrior action, being allowed actions:
+
+-C<annotate, append, delete, denotate, done, duplicate, edit, information, modify, prepend, start, stop>
+
+-C<add, calendar, log, undo, version>
+
+Those taskwarrior commands that need a task number (first group) operate on the current task.  Commands can be shortened when not ambiguous.   Any command to perform on other --not the current-- task like in C<175 delete> (when e.g.: 37 is the current one) is not allowed.
+
+
+
+=item -
+
+q, quit, exit, bye
+
+Terminate script execution at this point.  On exit the last reviewed task number is shown.
+
+
 
 =back
 
@@ -104,63 +156,177 @@ Terminate script execution.
 
 Taskwarrior 2.2.0+ must be installed.
 
-Some needed modules ship with perl (as of 5.06): Term::ANSIColor and Term::ReadLine .  But some do not:
+Some needed modules ship with perl (as of 5.06):
 
-=over 4
+=over
 
-=item Term::ReadLine::Gnu
+=item -
 
-Perl extension for the GNU Readline/History Library.
+Term::ANSIColor
+
+
+=item -
+
+Term::ReadLine
+
+
+=back
+
+But some do not:
+
+=over
+
+=item -
+
+Term::ReadLine::Gnu (Perl extension for the GNU Readline/History Library)
+
 
 =back
 
 You will need to install it from your distribution (this is libterm-readline-gnu-perl.deb package in debian-like) or get it from CPAN.
 
+
 =head1 CONFIGURATION
 
-Defaults (mark and marking actions, prompt text, label and separator styles) can be modified directly in the Configuration section of the script source code.  Perl is an interpreted scripting language, so no compilation or building is needed.
+No configuration is necessary if you can go with the hard wired defaults (see FILES for parameter details).  Otherwise the script source code can be edited or a configuration file can be created.
 
-Currently you can choose between two localizations: en-US and es-ES.  This is done in the L10N section of the source code, uncommenting the localized STRINGs in your preferred localization and commenting out the other set.
 
-=head1 EXAMPLES
+=head2 Source code
+
+Hard wired defaults (mark tag and marking actions, filter, upper and lower labels, localization, info view, time counter, prompt text, label and separator styles) can be modified directly in the Configuration section of the script source code.  As perl is an interpreted scripting language, no compilation or build is needed.  Currently you can choose between two localizations: eng-USA and esp-ESP.
+
+
+=head2 Configuration file
+
+Default C<trev> behavior can be configured, as well as pre-configured I<named reviews> can be defined in an optional configuration file named C<trevrc> or C<.trevrc>.  See FILES for C<trevrc> syntax and semantics.
+
+
+=head2 INSTALL
+
+In order to simplify shell calls to C<perl trev.pl> and to avoid shell interpolation of arguments two ways can be followed:
 
 =over
 
-=item trev.pl
+=item 1.
 
-Reviews all visible tasks (user default filter), starts reviewing at first of them (default), mark/unmark current task with start/stop (default).
+Add an alias in your C<.bashrc> , C<.bash_aliases> or similar:
 
-=item trev.pl ++week
 
-Set marking tag to +week and mark/unmark current task with 'modify +week'/'modify -week'.
+=back
 
-=item trev.pl ++calendula +ate_loops
+ 
+ alias trev='perl ~/path/to/the/script/trev.pl'
 
-Mark/unmark using 'modify +/-calendula'; Reviews only ate_loops tagged tasks.
 
-=item trev.pl ++deleg 113+ pro:wp5
+=over
 
-Set marking tag to +deleg, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
+=item 1.
 
-=item trev.pl 113+ due:
+Create an executable shell script somewhere in your path (C<~/bin/trev>), containing: 
+
+
+=back
+
+```
+
+
+=head1 !/bin/sh
+
+perl ~/path/to/the/script/trev.pl $*
+```
+Use it, in both cases, as:
+
+ 
+ $ trev arguments
+
+
+Allowing or not shell interpolation of arguments may cause different behavior.
+
+
+=head1 EXAMPLES
+
+C<trev> trev can be replaced by C<perl ~/path/to/the/script/trev.pl>
+
+=over
+
+=item -
+
+C<trev>
+
+Reviews tasks (user's task default filter), starts reviewing at first of them (default), mark/unmark current task with start/stop (default).
+
+
+
+=item -
+
+C<trev ++week>
+
+Sets marking tag to +week and mark/unmark current task with 'modify +week'/'modify -week'.
+
+
+
+=item -
+
+C<trev ++calendula +ate\_loops>
+
+Mark/unmark using 'modify +/-calendula'; reviews only ate_loops tagged tasks.
+
+
+
+=item -
+
+C<trev ++deleg 113+ pro:wp5>
+
+Sets marking tag to +deleg, start reviewing at task 113 and process only tasks appertaining to a certain wp5 project.
+
+
+
+=item -
+
+C<trev 113+ due:>
 
 Processes only tasks without a due date.  Start at task 113.  Mark/unmark with start/stop and starts at the top of the list (defaults).
 
-=item trev.pl ++NOW overdue
+
+
+=item -
+
+C<trev ++NOW overdue>
 
 Processes overdue tasks.  Mark/unmark with 'modify +/-NOW'.
 
-=item trev.pl 113
+
+
+=item -
+
+C<trev 113>
 
 Reviews just task 113.  Start/stop for mark/unmark (default).
 
-=item trev.pl amsterdam
 
-Review every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
 
-=item trev -T 'Make these phone calls\!' -t 'These are high-urgency actionable tasks!' ++call  urgency.over:12 +READY
+=item -
 
-Review every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping quotation marks.
+C<trev amsterdam>
+
+Reviews every task containing amsterdam in its description, starting at the top of the list and marking/unmarking with start/stop.
+
+
+
+=item -
+
+C<trev -T 'Make these phone calls\\!' -t 'These are high-urgency actionable tasks!' ++call  urgency.over:12 +READY>
+
+Reviews every task with an urgency.over:12 and marked +READY, starting at the top of the list and marking/unmarking with mod +call/-call.  'Make these phone calls!' and 'These are high-urgency actionable tasks!' appear respectively at the end of upper and lower labels.  Remark the necessary escaping quotation marks.
+
+
+
+=item -
+
+C<trev wp5>
+
+Reviews tasks following settings in a single or cascaded named review defined in the configuration file. 
+
 
 
 =back
@@ -168,26 +334,306 @@ Review every task with an urgency.over:12 and marked +READY, starting at the top
 
 =head1 FILES
 
-No specific files are used, but the script issues system calls to 'task', and this is the expected name of the task executable. This can be modified inside the source code.
+
+=head2 trevrc
+
+C<trevrc> (or C<.trevrc> depending on the location), is an optional plain text file that can contain configuration instructions for C<trev> and is looked for and read at the beginning of every execution.  Instructions in this file are in the form:
+ 
+ review.name.parameter = value
+
+where 'review' must be always present as is, 'name' names a I<named review>, 'parameter' refers to an specific behavioral aspect and 'value' concretes this behavior. So:
+ 
+ review.default.L10N       = esp-ESP
+
+specifies that the Spanish localization must be used instead of the hard wired default eng-USA.
+
+Any number of blanks or tabs can be used before, after or between the three tokens 'review.name.parameter', '=' and 'value'; but if in 'value' blanks are desired to appear at the beginning or at the end of the string, like in: 
+ 
+ review.wp5*.upper        = '           **THIS IS IMPORTANT**'
+
+it must be enclosed between quotations.  No shell escaping is needed.
+
+The following paths are searched, in this order, for the configuration file:
+
+=over
+
+=item -
+
+C<~/.task/trevrc>
+
+
+=item -
+
+C<~/.trevrc> (note the dot, hidden file).
+
+
+=item -
+
+C<[trev.pl script dir]/trevrc> (mainly for development+repository purposes)
+
+
+=back
+
+First file found is used.
+
+
+=head2 Default behavior in trevrc
+
+Default behavior --different from hard wired defaults-- for C<trev> can be configured by defining the special named review 'default' in the configuration file. An example default set of parameters follows:
+```
+
+
+=head1 ------------------------------------------------- default behavior/parameters
+
+review.default.seltag     = +hard  +donow
+review.default.on         = modify +donow
+review.default.off        = modify -donow
+review.default.filter     = +hard
+
+review.default.L10N       = esp-ESP
+review.default.viewinfo   = off
+review.default.showtime   = on
+
+review.default.prompt     = 'trev> '     # quotes to include blank
+review.default.upper      = 
+review.default.lower      = [modo por defecto: hard=>donow]
+review.default.lblstyle   = reverse bold
+review.default.sepstyle   = underline bold
+```
+Blank/void lines as well as anything following a '#' character is ignored.
+
+
+=head2 Parameter and hard wired defaults
+
+Explanations concerning parameters follow, indicating the hard wired defaults:
+
+=over
+
+=item -
+
+seltag
+
+(active) Tag (or report) used as mark for selected tasks.
+
+
+
+=item -
+
+on
+
+(start) Taskwarrior command that makes the current task part of the selected set. (More usually this would be something as 'modify +markingtag'.
+
+
+
+=item -
+
+off
+
+(stop) Taskwarrior command that takes out the current task part from the selected set.
+
+
+
+=item -
+
+filter
+
+('') Expression that Taskwarrior will use as filter to get the task(s) to review. 
+
+
+
+=item -
+
+L10N
+
+(eng-USA) Localization used for program messages.  Values can be {eng-USA , esp-ESP}.
+
+
+
+=item -
+
+viewinfo
+
+(on) This switch (on/off) causes the program to show (or not) detailed information on the task being reviewed.
+
+
+
+=item -
+
+showtime
+
+(on) This switch (on/off) makes the program show time spent in the review at exit.
+
+
+
+=item -
+
+prompt
+
+('trev> ')
+
+
+
+=item -
+
+upper
+
+('') Additional text to appear at the upper label.
+
+
+
+=item -
+
+lower
+
+('') Additional text to appear at the lower label.
+
+
+
+=item -
+
+lblstyle
+
+(reverse bold) Decoration style for labels.  It depends on the capabilities of the console. 
+
+
+
+=item -
+
+sepstyle
+
+(underline bold) Decoration style for the separation between panel (counter, selected, task, labels) and prompt line.  It depends on the capabilities of the console. 
+
+
+
+=back
+
+
+=head2 Named reviews
+
+Parameter values for specific, frequent reviews can be defined in the configuration file and invoked in an easier way from the command line using its I<name> as an argument:
+ 
+ $ trev calls
+
+Definition of a named review is performed by issuing configuration instructions referring to the name in trevrc, e.g.: for the review named calls:
+```
+
+
+=head1 ------------------------------------------------------------- Calls
+
+review.calls.filter      = +phone urgency.over:12 +READY
+review.calls.seltag      = +call
+review.calls.on          = mod +call
+review.calls.off         = mod -call
+review.calls.prompt      = 'trev calls> '  # quotes to include blank
+review.calls.upper       = Make these phone calls!
+review.calls.lower       = These are high-urgency actionable tasks!
+```
+
+Those parameter undefined for the review (lblstyle and sepstyle in the example) are taken from defaults, so a named review can be defined with a single line in trevrc:
+ 
+ review.tod.filter = due.after:yesterday and due.before:tomorrow status:pending and -rev
+
+that takes every other parameter from defaults.
+
+
+=head2 Cascaded named reviews
+
+Complex review patterns can benefit from a sequential structure as multi-step, multi-level or cascaded sets of reviews, that can be oriented to grouping together, progressively refining, etc.  Named reviews can be used in C<trev> in a standalone way or cascaded, i.e.: starting at an specific named review, and when this one is finished the user is asked whether to stop the sequence or to continue with next named review in the sequence, until it finishes.  Sequence can be entered at any single named review, not necessarily at the beginning, and proceeding from there on, so the user can stop and resume later a formerly interrupted (between two steps) review.
+
+Definition of a cascaded review is performed in the configuration file as an I<ordered> group of named reviews sharing a common prefix in its name, being this prefix separated from the specific name of the step by a 'C<*>' character and preceding it.  An example follows for a cascaded review that performs the reviewing of a certain wp5 project in two steps: first tasks with a deadline and then those without one: 
+```
+
+
+=head1 ----------------------------------------------- wp5 multi
+
+review.wp5I<.filter       = pro:wp5
+review.wp5>.upper        = '                 B<IMPORTANT>'
+
+review.wp5I<due.filter    = pro:wp5 and due.any:  # deadline
+review.wp5>due.lower     = This is wp5-due
+
+review.wp5I<notdue.filter = pro:wp5 and due.none: # no deadline
+review.wp5>notdue.lower  = This is wp5-notdue
+```
+The first group, `wp5*`, without any specific step name, is used as a container for parameters common to all steps, but those parameter can be overwritten by definitions in single steps. So, `review.wp5*.filter` is here of any use because every step defines its own, overwriting filter; but `review.wp5*.upper` is used by `wp5*due` and `wp5*notdue` because `upper` is not defined for them.  Every other parameter is taken from defaults.  Order of the groups establishes the step review order: first single named review is addressed first, then second and so on.
+
+Cascaded reviews are invoked with its prefix, followed or not by 'C<*>':
+ 
+ $ trev wp5
+
+or
+ 
+ $ trev wp5*
+
+
+and starts with C<wp5*due>, proceeding till the natural end of it of when the user interrupts the review by means of the usual terminating commands: C<q>, C<quit>, C<exit> or C<bye>.  At this point the user is informed and prompted:
+```
+#
+
+
+=head1 Multi-step review (wp5):
+
+#
+
+
+=head1 Finished step : wp5*due
+
+
+=head1 Next step     : wp5*notdue
+
+#
+
+Proceed [RET] or [quit]? > 
+ 
+ If `q[uit]` (plus `[RET]`) is issued the whole review is terminated.  If `[RET]` is issued instead the program proceeds with the `wp5*notdue` step till this end or termination, when the user is informed:
+
+#
+
+
+=head1 Multi-step review (wp5):
+
+#
+
+
+=head1 Finished step : wp5*notdue (last)
+
+#
+```
+and the cascaded review is finished.
+
+As previously said, the sequence can be entered at an intermediate review:
+ 
+ $ trev wp5*notdue
+
+
+following afterwards the usual course.
+
+
+=head2 Taskwarrior executable
+
+The script issues system calls to 'task', and this is the expected name of the task executable. This can be modified inside the source code.
+
 
 =head1 CAVEATS
 
 This is a slow script, specially when --after an action-- the order or number of tasks changes and next task must be located through its uuid.
 
-In principle the script is intended to be used off-line, but if orders can come in any form from the web, beware: system calls are issued through backticks and any security check is performed.
+In principle the script is intended to be used off-line, but if orders can come in any form from the web, beware: system calls are issued through perl backticks and any security check is performed.
+
 
 =head1 BUGS
 
-Probably.
+https://github.com/nocejo/trev/issues
 
 
 =head1 AUTHOR
 
-Fidel Mato E<lt>fidel.mato at gmail.comE<gt>.
+Fidel Mato <fidel.mato at gmail.com>.
+
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013, Fidel Mato
+Copyright 2013-2015, Fidel Mato
 
 trev.pl is released under the MIT license.
 
@@ -211,10 +657,7 @@ SOFTWARE.
 
 http://www.opensource.org/licenses/mit-license.php
 
+
 =head1 DATE
 
-12-Apr-2015
-
-=cut
-
-
+25-May-2015
