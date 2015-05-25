@@ -631,6 +631,28 @@ https://github.com/nocejo/trev/issues
 Fidel Mato <fidel.mato at gmail.com>.
 
 
+=head1 CONTRIBUTORS
+
+=over
+
+=item -
+
+David J Patrick - linuxcaffe
+
+
+=item -
+
+Paul Beckingham - pbeckingham
+
+
+=item -
+
+Lars Wallenborn - larsborn 
+
+
+=back
+
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2013-2015, Fidel Mato
@@ -660,4 +682,4 @@ http://www.opensource.org/licenses/mit-license.php
 
 =head1 DATE
 
-25-May-2015
+22-May-2015

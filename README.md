@@ -382,10 +382,17 @@ In principle the script is intended to be used off-line, but if orders can come 
 https://github.com/nocejo/trev/issues
 
 
-
 # AUTHOR
 
 Fidel Mato \<fidel.mato at gmail.com\>.
+
+
+# CONTRIBUTORS
+
+- David J Patrick - linuxcaffe
+- Paul Beckingham - pbeckingham
+- Lars Wallenborn - larsborn 
+
 
 # COPYRIGHT AND LICENSE
 
